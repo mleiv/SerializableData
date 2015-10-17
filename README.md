@@ -76,7 +76,7 @@ There is also some support for CGFloat and NSURL, although they don't have XXXLi
     data["url"].url == NSURL(string: "http://www.example.com")
 }
 
-I will probably add CGSize and CGPoint and CGFrame eventually also, because I use those a lot and they are a pain to parse in and out of json.
+I will probably add CGSize and CGPoint and CGRect eventually also, because I use those a lot and they are a pain to parse in and out of json.
 
 
 ## Creating Serializable Objects
@@ -114,11 +114,8 @@ Using the SerializedDataStorable and SerializedDataRetrievable protocols, you ca
 	    }
 
 	    public mutating func setData(data: SerializableData) {
-            // you don't really have to use this function if you don't want, 
-            // but with value types it is sometimes nice to be able to setData() 
-            // instead of recreate the object with init?(), which would drop 
-            // any observers you have attached to the object.
-            // required (specify fallback values to whatever you want)
+            // you don't really have to use this function if you don't want, but with value types it is sometimes nice to be able to setData() instead of recreate the object with init?(), which would drop any observers you have attached to the object.
+            // required values (specify fallback values to whatever you want)
 	        myProp1 = data["myProp1"]?.string ?? myProp1
 	        myDataSubClass = MyDataSubClass(data: data["myDataSubClass"]) ?? myDataSubClass
             // optional values
