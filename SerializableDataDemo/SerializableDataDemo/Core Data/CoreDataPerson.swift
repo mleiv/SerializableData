@@ -59,11 +59,15 @@ extension CoreDataPerson: SerializedDataRetrievable {
     }
     
     public mutating func setData(data: SerializableData) {
+        //mandatory data (probably already set, but allow it to be set again if setData() was called separately)
+        name = data["name"]?.string ?? name
+        
+        //optional values:
         createdDate = data["createdDate"]?.date ?? NSDate()
         modifiedDate = data["modifiedDate"]?.date ?? NSDate()
-        self.profession = data["profession"]?.string
-        self.organization = data["organization"]?.string
-        self.notes = data["notes"]?.string
+        profession = data["profession"]?.string
+        organization = data["organization"]?.string
+        notes = data["notes"]?.string
     }
     
 }
