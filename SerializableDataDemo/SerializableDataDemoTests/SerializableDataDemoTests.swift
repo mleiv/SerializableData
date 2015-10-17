@@ -46,16 +46,20 @@ class SerializableDataDemoTests: XCTestCase {
     }
     
     func testString() {
-        if let serializableData = try? SerializableData(jsonString: sampleJson) {
-            if let personsList = serializableData["persons"]?.array {
-                XCTAssert(personsList[0]["name"]?.string == "Phil Myman", "Lost Phil's name")
-                XCTAssert(personsList[1]["name"]?.string == "Veronica Palmer", "Lost Veronica's name")
-                let philsStartDate = personsList[0]["createdDate"]?.date ?? NSDate()
-                    XCTAssert(philsStartDate.compare(sevenYearsAgo) == .OrderedDescending && philsStartDate.compare(fiveYearsAgo) == .OrderedAscending, "Misread Phil's start date")
+        do {
+            if let serializableData = try SerializableData(jsonString: sampleJson) {
+                if let personsList = serializableData["persons"]?.array {
+                    XCTAssert(personsList[0]["name"]?.string == "Phil Myman", "Lost Phil's name")
+                    XCTAssert(personsList[1]["name"]?.string == "Veronica Palmer", "Lost Veronica's name")
+                    let philsStartDate = personsList[0]["createdDate"]?.date ?? NSDate()
+                        XCTAssert(philsStartDate.compare(sevenYearsAgo) == .OrderedDescending && philsStartDate.compare(fiveYearsAgo) == .OrderedAscending, "Misread Phil's start date")
+                } else {
+                    XCTAssert(false, "Failed to recover array")
+                }
             } else {
-                XCTAssert(false, "Failed to recover array")
+                XCTAssert(false, "Failed to parse string")
             }
-        } else {
+        } catch {
             XCTAssert(false, "Failed to parse string")
         }
     }
@@ -64,16 +68,20 @@ class SerializableDataDemoTests: XCTestCase {
     func testRepeatedConversions(){
         if let jsonData = (sampleJson as NSString).dataUsingEncoding(NSUTF8StringEncoding) {
             if let serializableData = try? SerializableData(jsonData: jsonData) {
-                if let serializableData2 = try? SerializableData(jsonString: serializableData.jsonString) {
-                    if let personsList = serializableData2["persons"]?.array {
-                        XCTAssert(personsList[0]["name"]?.string == "Phil Myman", "Lost Phil's name")
-                        XCTAssert(personsList[1]["name"]?.string == "Veronica Palmer", "Lost Veronica's name")
-                        let philsStartDate = personsList[0]["createdDate"]?.date ?? NSDate()
-                        XCTAssert(philsStartDate.compare(sevenYearsAgo) == .OrderedDescending && philsStartDate.compare(fiveYearsAgo) == .OrderedAscending, "Misread Phil's start date")
+                do {
+                    if let serializableData2 = try SerializableData(jsonString: serializableData.jsonString) {
+                        if let personsList = serializableData2["persons"]?.array {
+                            XCTAssert(personsList[0]["name"]?.string == "Phil Myman", "Lost Phil's name")
+                            XCTAssert(personsList[1]["name"]?.string == "Veronica Palmer", "Lost Veronica's name")
+                            let philsStartDate = personsList[0]["createdDate"]?.date ?? NSDate()
+                            XCTAssert(philsStartDate.compare(sevenYearsAgo) == .OrderedDescending && philsStartDate.compare(fiveYearsAgo) == .OrderedAscending, "Misread Phil's start date")
+                        } else {
+                            XCTAssert(false, "Failed to recover array")
+                        }
                     } else {
-                        XCTAssert(false, "Failed to recover array")
+                        XCTAssert(false, "Failed to parse string")
                     }
-                } else {
+                } catch {
                     XCTAssert(false, "Failed to parse string")
                 }
             } else {
@@ -109,6 +117,32 @@ class SerializableDataDemoTests: XCTestCase {
         XCTAssert(serializedDictionary.jsonString == "{\n  \"key1\" : \"value1\"\n}", "Did not correctly serialize a Dictionary")
     }
     
+    func testCgFloat() {
+        var serializableData = SerializableData()
+        // sorry, this won't work
+//        serializableData["cgfloat"] = CGFloat(5)
+        // but this will
+        let cgFloat1 = CGFloat(5)
+        serializableData["cgfloat"] = cgFloat1.getData()
+        // and so will this:
+        serializableData["cgfloats"] = [cgFloat1, CGFloat(1.5)]
+        XCTAssert(serializableData["cgfloat"]?.cgFloat == cgFloat1, "Did not correctly serialize CGFloat")
+        XCTAssert(serializableData["cgfloats"]?[0]?.cgFloat == cgFloat1, "Did not correctly serialize CGFloat Array")
+    }
+    
+    func testUrl() {
+        var serializableData = SerializableData()
+        // sorry, this won't work
+//        serializableData["url"] = NSURL(string: "http://example.com/")
+        // but this will
+        let nsUrl = NSURL(string: "http://example.com/")
+        serializableData["url"] = nsUrl?.getData()
+        // and so will this:
+        let urls: [SerializedDataStorable?] = [nsUrl, NSURL(string: "http://yahoo.com/")]
+        serializableData["urls"] = SerializableData(urls)
+        XCTAssert(serializableData["url"]?.url == nsUrl, "Did not correctly serialize CGFloat")
+        XCTAssert(serializableData["urls"]?[0]?.url == nsUrl, "Did not correctly serialize CGFloat Array")
+    }
     
     func stringFromDate(value: NSDate) -> String? {
         let dateFormatter = NSDateFormatter()

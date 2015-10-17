@@ -8,8 +8,7 @@
 //  Redistributions of files must retain the above copyright notice.
 //
 
-import Foundation
-
+import UIKit
 
 public enum SerializableDataError : ErrorType {
     case ParsingError
@@ -115,13 +114,14 @@ public struct SerializableData {
     }
     
     /// - Parameter jsonString: parses a json-formatted string. Throws error if it can't parse it/make it SerializableData.
-    public init(jsonString: String) throws {
-        print(jsonString)
-        if let data = (jsonString as NSString).dataUsingEncoding(NSUTF8StringEncoding) {
+    public init?(jsonString: String) throws {
+        try self.init(serializedString: jsonString)
+    }
+    
+    public init?(serializedString json: String) throws {
+        if let data = (json as NSString).dataUsingEncoding(NSUTF8StringEncoding) {
             try self.init(jsonData: data)
-            print("PASS")
         } else {
-            print("FAIL")
             throw SerializableDataError.ParsingError
         }
     }
@@ -150,7 +150,12 @@ extension SerializableData {
                 return tValue
             } else if let tValue = formatter.numberFromString(s)?.doubleValue as? T {
                 return tValue
+            } else if let v = formatter.numberFromString(s)?.doubleValue,
+                      let tValue = CGFloat(v) as? T {
+                return tValue
             } else if let tValue = dateFromString(s) as? T {
+                return tValue
+            } else if let tValue = NSURL(string: s) as? T {
                 return tValue
             } else if let tValue = formatter.numberFromString(s) as? T { //NSNumber
                 return tValue
@@ -183,8 +188,12 @@ extension SerializableData {
     public var float: Float? { return value() as Float? }
     /// - Returns: Optional(Double) if this object can be converted to one
     public var double: Double? { return value() as Double? }
+    /// - Returns: Optional(CGFloat) if this object can be converted to one
+    public var cgFloat: CGFloat? { return value() as CGFloat? }
     /// - Returns: Optional(NSNumber) if this object can be converted to one
     public var nsNumber: NSNumber? { return value() as NSNumber? }
+    /// - Returns: Optional(NSURL) if this object can be converted to one
+    public var url: NSURL? { return value() as NSURL? }
     /// - Returns: Optional(NSDate) if this object can be converted to one
     public var date: NSDate? { return value() as NSDate? }
     /// - Returns: Optional(NSDate) if this object can be converted to one

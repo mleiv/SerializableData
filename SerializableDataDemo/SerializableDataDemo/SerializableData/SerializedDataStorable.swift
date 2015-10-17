@@ -8,7 +8,7 @@
 //  Redistributions of files must retain the above copyright notice.
 //
 
-import Foundation
+import UIKit
 
 //MARK: SerializedDataStorable Protocol
 // (can be extended to any type you want, just implement getData)
@@ -43,6 +43,7 @@ extension String: SerializedDataStorable {}
 extension Int: SerializedDataStorable {}
 extension Double: SerializedDataStorable {}
 extension Float: SerializedDataStorable {}
+extension CGFloat: SerializedDataStorable {}
 // NS-stuff is nearly impossible to conform to SerializedDataRetrievable, so I am just skipping that for basic types
 extension NSString: SerializedDataStorable {}
 extension NSNumber: SerializedDataStorable {}
@@ -55,6 +56,11 @@ extension SerializableData: SerializedDataStorable {
 extension NSDate: SerializedDataStorable {
     public func getData() -> SerializableData {
         return SerializableData(date: self) // special case
+    }
+}
+extension NSURL: SerializedDataStorable {
+    public func getData() -> SerializableData {
+        return SerializableData(self.absoluteString)
     }
 }
 
