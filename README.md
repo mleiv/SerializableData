@@ -53,7 +53,7 @@ You can extract these values back out using .string, .int, .float, .double, .nsN
 
 I did not bother to make SerializableData adhere to any of the collection protocols - if you want to interact with arrays or dictionaries, just pull their .array (type [SerializableData]?) or .dictionary (type [String: SerializableData]?) value and iterate through that.
 
-```
+```swift
 
 	var data = SerializableData()
 	data["myArray"] = [1,2,3]
@@ -64,6 +64,20 @@ I did not bother to make SerializableData adhere to any of the collection protoc
     }
 }
 ```
+
+There is also some support for CGFloat and NSURL, although they don't have XXXLiteralConvertible protocols, so you have to work a bit harder.
+
+```swift
+
+	var data = SerializableData()
+	data["cgfloat"] = CGFloat(50).getData()
+	data["url"] = NSURL(string: "http://www.example.com")?.getData()
+    data["cgfloat"].cgFloat == CGFloat(50)
+    data["url"].url == NSURL(string: "http://www.example.com")
+}
+
+I will probably add CGSize and CGPoint and CGFrame eventually also, because I use those a lot and they are a pain to parse in and out of json.
+
 
 ## Creating Serializable Objects
 
@@ -87,41 +101,56 @@ Using the SerializedDataStorable and SerializedDataRetrievable protocols, you ca
 	    public init() {}
 	    
 	    public init?(data: SerializableData?) {
-	        guard let data = data, let myProp1 = data["myProp1"]?.string, let myDataSubClass = MyDataSubClass(data: data["myDataSubClass"])
+	        guard let data = data, let myProp1 = data["myProp1"]?.string, 
+                  let myDataSubClass = MyDataSubClass(data: data["myDataSubClass"])
 	        else {
 	            return nil
 	        }
 	        // required values:
 	        self.myProp1 = myProp1
 	        self.myDataSubClass = myDataSubClass
-	        // optional values:
-	        setData(data)
+	        // optional values
+	        myOptionalProp2 = data["myOptionalProp2"]?.int
 	    }
 
 	    public mutating func setData(data: SerializableData) {
+            // you don't really have to use this function if you don't want, 
+            // but with value types it is sometimes nice to be able to setData() 
+            // instead of recreate the object with init?(), which would drop 
+            // any observers you have attached to the object.
+            // required (specify fallback values to whatever you want)
+	        myProp1 = data["myProp1"]?.string ?? myProp1
+	        myDataSubClass = MyDataSubClass(data: data["myDataSubClass"]) ?? myDataSubClass
+            // optional values
 	        myOptionalProp2 = data["myOptionalProp2"]?.int
 	    }
 	}
 
 	public class MyDataSubClass: SerializedDataStorable, SerializedDataRetrievable {
 		public var myNestedProp1: String = "Test"
+        
 	    public func getData() -> SerializableData {
 	        var list = [String: SerializedDataStorable?]()
 	        list["myNestedProp1"] = myNestedProp1
 	        return SerializableData(list)
 	    }
+        
 	    public init(myNestedProp1: String) {
 	        self.myNestedProp1 = myNestedProp1
 	    }
+        
 	    public required init?(data: SerializableData?) {
-	        guard let data = data, let myNestedProp1 = data["myNestedProp1"]?.string
+	        guard let data = data, 
+                  let myNestedProp1 = data["myNestedProp1"]?.string
 	        else {
 	            return nil
 	        }
 	        // required values:
 	        self.myNestedProp1 = myNestedProp1
 	    }
+        
 	    public func setData(data: SerializableData) {}
+        
 	    // only required for class objects (sorry!):
 	    public required convenience init?(serializedString json: String) throws {
 	        self.init(data: try SerializableData(jsonString: json))
