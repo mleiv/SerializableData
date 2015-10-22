@@ -47,17 +47,14 @@ class SerializableDataDemoTests: XCTestCase {
     
     func testString() {
         do {
-            if let serializableData = try SerializableData(jsonString: sampleJson) {
-                if let personsList = serializableData["persons"]?.array {
-                    XCTAssert(personsList[0]["name"]?.string == "Phil Myman", "Lost Phil's name")
-                    XCTAssert(personsList[1]["name"]?.string == "Veronica Palmer", "Lost Veronica's name")
-                    let philsStartDate = personsList[0]["createdDate"]?.date ?? NSDate()
-                        XCTAssert(philsStartDate.compare(sevenYearsAgo) == .OrderedDescending && philsStartDate.compare(fiveYearsAgo) == .OrderedAscending, "Misread Phil's start date")
-                } else {
-                    XCTAssert(false, "Failed to recover array")
-                }
+            let serializableData = try SerializableData(jsonString: sampleJson)
+            if let personsList = serializableData["persons"]?.array {
+                XCTAssert(personsList[0]["name"]?.string == "Phil Myman", "Lost Phil's name")
+                XCTAssert(personsList[1]["name"]?.string == "Veronica Palmer", "Lost Veronica's name")
+                let philsStartDate = personsList[0]["createdDate"]?.date ?? NSDate()
+                    XCTAssert(philsStartDate.compare(sevenYearsAgo) == .OrderedDescending && philsStartDate.compare(fiveYearsAgo) == .OrderedAscending, "Misread Phil's start date")
             } else {
-                XCTAssert(false, "Failed to parse string")
+                XCTAssert(false, "Failed to recover array")
             }
         } catch {
             XCTAssert(false, "Failed to parse string")
@@ -67,25 +64,19 @@ class SerializableDataDemoTests: XCTestCase {
     
     func testRepeatedConversions(){
         if let jsonData = (sampleJson as NSString).dataUsingEncoding(NSUTF8StringEncoding) {
-            if let serializableData = try? SerializableData(jsonData: jsonData) {
-                do {
-                    if let serializableData2 = try SerializableData(jsonString: serializableData.jsonString) {
-                        if let personsList = serializableData2["persons"]?.array {
-                            XCTAssert(personsList[0]["name"]?.string == "Phil Myman", "Lost Phil's name")
-                            XCTAssert(personsList[1]["name"]?.string == "Veronica Palmer", "Lost Veronica's name")
-                            let philsStartDate = personsList[0]["createdDate"]?.date ?? NSDate()
-                            XCTAssert(philsStartDate.compare(sevenYearsAgo) == .OrderedDescending && philsStartDate.compare(fiveYearsAgo) == .OrderedAscending, "Misread Phil's start date")
-                        } else {
-                            XCTAssert(false, "Failed to recover array")
-                        }
-                    } else {
-                        XCTAssert(false, "Failed to parse string")
-                    }
-                } catch {
-                    XCTAssert(false, "Failed to parse string")
+            do {
+                let serializableData = try SerializableData(jsonData: jsonData)
+                let serializableData2 = try SerializableData(jsonString: serializableData.jsonString)
+                if let personsList = serializableData2["persons"]?.array {
+                    XCTAssert(personsList[0]["name"]?.string == "Phil Myman", "Lost Phil's name")
+                    XCTAssert(personsList[1]["name"]?.string == "Veronica Palmer", "Lost Veronica's name")
+                    let philsStartDate = personsList[0]["createdDate"]?.date ?? NSDate()
+                    XCTAssert(philsStartDate.compare(sevenYearsAgo) == .OrderedDescending && philsStartDate.compare(fiveYearsAgo) == .OrderedAscending, "Misread Phil's start date")
+                } else {
+                    XCTAssert(false, "Failed to recover array")
                 }
-            } else {
-                XCTAssert(false, "Failed to parse data")
+            } catch {
+                XCTAssert(false, "Failed to parse string")
             }
         } else {
             XCTAssert(false, "Failed to create data")

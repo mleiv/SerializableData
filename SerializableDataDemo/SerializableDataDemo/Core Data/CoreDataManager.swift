@@ -79,7 +79,7 @@ public struct CoreDataManager {
         do {
             if let coreItem = fetchRow(item) {
                 let serializedString = (coreItem.valueForKey(Keys.serializedData) as? String) ?? ""
-                if let t = try T(serializedString: serializedString) {
+                if let t = T(serializedString: serializedString) {
                     return t
                 } else {
                     throw CoreDataManagerError.FailedToInitializedObject

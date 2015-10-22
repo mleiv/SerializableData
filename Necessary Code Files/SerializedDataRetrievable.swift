@@ -16,19 +16,19 @@ import Foundation
 
 public protocol SerializedDataRetrievable {
     init?(data: SerializableData?) // implement this
-    init?(serializedString json: String) throws // implement in class (not required in struct)
+    init?(serializedString json: String) // implement in class (not required in struct)
 }
 
 // default protocol functions:
 
 extension SerializedDataRetrievable {
-    public init?(serializedString json: String) throws {
-        self.init(data: try SerializableData(jsonString: json))
+    public init?(serializedString json: String) {
+        self.init(data: try? SerializableData(jsonString: json))
     }
     /*
     // COPY THIS TO ANY SerializedDataRetrievable CLASSES:
-    public required convenience init?(serializedString json: String) throws {
-        self.init(data: try SerializableData(jsonString: json))
+    public required convenience init?(serializedString json: String) {
+        self.init(data: try? SerializableData(jsonString: json))
     }
     */
 }

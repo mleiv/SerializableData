@@ -53,8 +53,8 @@ public struct UserDefaultsManager {
     public static func getAll<T: UserDefaultsStorable>() -> [T] {
         do {
             let defaults = NSUserDefaults.standardUserDefaults()
-            if let serializedString = defaults.objectForKey(T.userDefaultsEntityName) as? String,
-               let serializedList = try SerializableData(jsonString: serializedString) {
+            if let serializedString = defaults.objectForKey(T.userDefaultsEntityName) as? String {
+                let serializedList = try SerializableData(jsonString: serializedString)
                 let all = (serializedList.array ?? []).map {
                     return T(data: $0)
                 }.filter{ $0 != nil }.map{ $0! }

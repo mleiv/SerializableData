@@ -114,11 +114,11 @@ public struct SerializableData {
     }
     
     /// - Parameter jsonString: parses a json-formatted string. Throws error if it can't parse it/make it SerializableData.
-    public init?(jsonString: String) throws {
+    public init(jsonString: String) throws {
         try self.init(serializedString: jsonString)
     }
     
-    public init?(serializedString json: String) throws {
+    public init(serializedString json: String) throws {
         if let data = (json as NSString).dataUsingEncoding(NSUTF8StringEncoding) {
             try self.init(jsonData: data)
         } else {

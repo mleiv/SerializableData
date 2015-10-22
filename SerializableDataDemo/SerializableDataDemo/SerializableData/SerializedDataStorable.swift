@@ -44,7 +44,6 @@ extension Int: SerializedDataStorable {}
 extension Double: SerializedDataStorable {}
 extension Float: SerializedDataStorable {}
 extension CGFloat: SerializedDataStorable {}
-// NS-stuff is nearly impossible to conform to SerializedDataRetrievable, so I am just skipping that for basic types
 extension NSString: SerializedDataStorable {}
 extension NSNumber: SerializedDataStorable {}
 extension NSNull: SerializedDataStorable {}
