@@ -312,7 +312,7 @@ extension SerializableData {
 //MARK: formatting data for other uses
     
     /// - Returns: AnyObject (closest to the format used to create the SerializableData object originally)
-    var anyObject: AnyObject {
+    public var anyObject: AnyObject {
         switch contents {
         case .ValueType(let v):
             return v as? AnyObject ?? NSNull()
@@ -334,7 +334,7 @@ extension SerializableData {
     }
 
     /// - Returns: An NSData object
-    var nsData: NSData? {
+    public var nsData: NSData? {
         if case .None = contents {
             // can't make a json object with *just* nil (NSNull inside array/dictionary is okay)
             return nil
