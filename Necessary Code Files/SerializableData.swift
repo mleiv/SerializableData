@@ -12,6 +12,7 @@ import UIKit
 
 public enum SerializableDataError : ErrorType {
     case ParsingError
+    case FileLoadError
     case TypeMismatch
     case MissingRequiredField
 }
@@ -102,7 +103,21 @@ public struct SerializableData {
             contents = .ValueType(sDate)
         }
     }
+    
+    /// Note: You probably want to run this on a background thread for large data
+    /// - Parameter fileName: a file inside documents folder, presumably of json format
+    public init(fileName: String) throws {
+        if let documents = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true).first {
+            let path = (documents as NSString).stringByAppendingPathComponent(fileName)
+            if let data = NSData(contentsOfFile: path) {
+                try self.init(jsonData: data)
+                return
+            }
+        }
+        throw SerializableDataError.FileLoadError
+    }
 
+    /// Note: You probably want to run this on a background thread for large data
     /// - Parameter jsonData: parses a json list of NSData format. Throws error if it can't parse it/make it SerializableData.
     public init(jsonData: NSData) throws {
         do {
@@ -113,6 +128,7 @@ public struct SerializableData {
         }
     }
     
+    /// Note: You probably want to run this on a background thread for large data
     /// - Parameter jsonString: parses a json-formatted string. Throws error if it can't parse it/make it SerializableData.
     public init(jsonString: String) throws {
         try self.init(serializedString: jsonString)
@@ -310,6 +326,38 @@ extension SerializableData {
 
 extension SerializableData {
 //MARK: formatting data for other uses
+    
+    /// Note: You probably want to run this on a background thread for large data
+    /// - Parameter fileName: writes file of this name to documents folder; can be retrieved via init(file:)
+    /// - Returns: true if write was a success
+    public func store(fileName fileName: String) -> Bool {
+        guard let data = nsData,
+           let documents = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true).first
+        else {
+            return false
+        }
+        let path = (documents as NSString).stringByAppendingPathComponent(fileName)
+        if data.writeToFile(path, atomically: true) == true {
+            if NSFileManager.defaultManager().fileExistsAtPath(path) {
+                return true
+            }
+        }
+        return false
+    }
+    
+    /// - Parameter fileName: deletes file of this name from documents folder
+    /// - Returns: true if delete was a success
+    public func delete(fileName fileName: String) -> Bool {
+        guard let documents = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true).first
+        else {
+            return false
+        }
+        let path = (documents as NSString).stringByAppendingPathComponent(fileName)
+        if let _ = try? NSFileManager.defaultManager().removeItemAtPath(path) where !NSFileManager.defaultManager().fileExistsAtPath(path) {
+            return true
+        }
+        return false
+    }
     
     /// - Returns: AnyObject (closest to the format used to create the SerializableData object originally)
     public var anyObject: AnyObject {

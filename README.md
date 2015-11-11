@@ -12,6 +12,21 @@ There is no CocoaPods or Carthage installation option. If you want this, just co
 * StringExtension.swift
 * DictionaryExtension.swift
 
+## News 2015-11-10
+
+Added file read/write functions.
+
+```swift
+
+do {
+    let fileName = "store.data"
+    if serializableData.store(fileName: fileName) {
+        let retrievedData = try SerializableData(fileName: fileName)
+        // serializableData and retrievedData should be identical
+    }
+}
+```
+
 ## Storing and Retrieving JSON in SerializableData
 
 You can easily parse JSON from either a string or NSData object. You can also retrieve a json-formatted or url-string-formatted version of any SerializableData object.

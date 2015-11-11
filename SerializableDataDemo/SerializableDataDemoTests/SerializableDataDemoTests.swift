@@ -135,6 +135,36 @@ class SerializableDataDemoTests: XCTestCase {
         XCTAssert(serializableData["urls"]?[0]?.url == nsUrl, "Did not correctly serialize CGFloat Array")
     }
     
+    
+    func testFileReadWrite() {
+        do {
+            let serializableData = try SerializableData(jsonString: sampleJson)
+            let fileName = "store.data"
+            if serializableData.store(fileName: fileName) {
+                let retrievedData = try SerializableData(fileName: fileName)
+                if let personsList = retrievedData["persons"]?.array {
+                    XCTAssert(personsList[0]["name"]?.string == "Phil Myman", "Lost Phil's name")
+                } else {
+                    XCTAssert(false, "Failed to retrieve array from file")
+                }
+                if retrievedData.delete(fileName: fileName) {
+                    if let documents = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true).first {
+                        let path = (documents as NSString).stringByAppendingPathComponent(fileName)
+                        XCTAssert(NSFileManager.defaultManager().fileExistsAtPath(path) == false, "Reported file delete but file exists")
+                    } else {
+                        XCTAssert(false, "Problem with documents folder")
+                    }
+                } else {
+                    XCTAssert(false, "Failed to delete file")
+                }
+            } else {
+                XCTAssert(false, "Failed to write file")
+            }
+        } catch {
+            XCTAssert(false, "Failed to parse string")
+        }
+    }
+    
     func stringFromDate(value: NSDate) -> String? {
         let dateFormatter = NSDateFormatter()
         //add more flexible parsing later
