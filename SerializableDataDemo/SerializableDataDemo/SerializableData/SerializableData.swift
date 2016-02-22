@@ -81,11 +81,11 @@ public struct SerializableData {
     /// - Parameter data: a variety of data that can be categorized as AnyObject. Anything not SerializedDataStorable at some level will eventually be rejected and throw error. NSNull is acceptable.
     public init(anyData data: AnyObject) throws {
         if let a = data as? [AnyObject] {
-            var aValues = [SerializableData]()
+            var aValues: [SerializableData] = []
             for (value) in a { aValues.append( try SerializableData(anyData: value) ) }
             contents = .ArrayType(aValues)
         } else if let d = data as? [String: AnyObject] {
-            var dValues = [String: SerializableData]()
+            var dValues: [String: SerializableData] = [:]
             for (key, value) in d { dValues[key] = try SerializableData(anyData: value) }
             contents = .DictionaryType(dValues)
         } else if data is NSNull {
@@ -220,7 +220,8 @@ extension SerializableData {
     private func dateFromString(value: String) -> NSDate? {
         let dateFormatter = NSDateFormatter()
         //add more flexible parsing later?
-        dateFormatter.dateFormat = "YYYY-MM-dd HH:mm:ss"
+        dateFormatter.locale = NSLocale(localeIdentifier: "en_US_POSIX")
+        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         dateFormatter.timeZone = NSTimeZone(abbreviation: "UTC")
         let date = dateFormatter.dateFromString(value)
         return date
@@ -231,7 +232,8 @@ extension SerializableData {
     private func stringFromDate(value: NSDate) -> String? {
         let dateFormatter = NSDateFormatter()
         //add more flexible parsing later
-        dateFormatter.dateFormat = "YYYY-MM-dd HH:mm:ss"
+        dateFormatter.locale = NSLocale(localeIdentifier: "en_US_POSIX")
+        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         dateFormatter.timeZone = NSTimeZone(abbreviation: "UTC")
         return dateFormatter.stringFromDate(value)
     }
@@ -460,7 +462,9 @@ extension SerializableData {
     /// - Parameter unescaped: The string to be escaped
     /// - Returns: An escaped String in format "something%20here"
     public static func urlEncode(unescaped: SerializedDataStorable) -> String {
-        if !(unescaped is NSNull), let escaped = "\(unescaped)".stringByAddingPercentEncodingWithAllowedCharacters(.URLHostAllowedCharacterSet()) {
+        let characterSet = NSMutableCharacterSet.alphanumericCharacterSet()
+        characterSet.addCharactersInString("-._~")
+        if !(unescaped is NSNull), let escaped = "\(unescaped)".stringByAddingPercentEncodingWithAllowedCharacters(characterSet) {
             return escaped
         }
         return ""
