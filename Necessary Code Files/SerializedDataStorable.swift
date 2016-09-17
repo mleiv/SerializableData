@@ -54,7 +54,7 @@ extension SerializableData: SerializedDataStorable {
 
 extension Date: SerializedDataStorable {
     public func getData() -> SerializableData {
-        return SerializableData(date: self) // special case
+        return SerializableData.safeInit(date: self) // special case
     }
 }
 extension URL: SerializedDataStorable {

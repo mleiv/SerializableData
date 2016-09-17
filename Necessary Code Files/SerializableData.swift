@@ -86,10 +86,16 @@ public struct SerializableData {
     }
     
     /// - Parameter date: does date to string conversion before storing value
-    public init(date: Date) {
+    public init(date: Date) throws {
        if let sDate = stringFromDate(date) {
             contents = .valueType(sDate)
+        } else {
+            throw SerializableDataError.parsingError
         }
+    }
+    
+    public static func safeInit(date: Date) -> SerializableData {
+       return (try? SerializableData(date: date)) ?? SerializableData()
     }
     
     /// Note: You probably want to run this on a background thread for large data
