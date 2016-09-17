@@ -36,31 +36,33 @@ extension SerializedDataStorable {
     }
 }
 
+public protocol SerializedDataStorableFlatValue {}
+
 // default applications of storable protocol
 
-extension Bool: SerializedDataStorable {}
-extension String: SerializedDataStorable {}
-extension Int: SerializedDataStorable {}
-extension Double: SerializedDataStorable {}
-extension Float: SerializedDataStorable {}
-extension CGFloat: SerializedDataStorable {}
-extension NSString: SerializedDataStorable {}
-extension NSNumber: SerializedDataStorable {}
-extension NSNull: SerializedDataStorable {}
+extension Bool: SerializedDataStorable, SerializedDataStorableFlatValue {}
+extension String: SerializedDataStorable, SerializedDataStorableFlatValue {}
+extension Int: SerializedDataStorable, SerializedDataStorableFlatValue {}
+extension Double: SerializedDataStorable, SerializedDataStorableFlatValue {}
+extension Float: SerializedDataStorable, SerializedDataStorableFlatValue {}
+extension CGFloat: SerializedDataStorable, SerializedDataStorableFlatValue {}
+extension NSString: SerializedDataStorable, SerializedDataStorableFlatValue {}
+extension NSNumber: SerializedDataStorable, SerializedDataStorableFlatValue {}
+extension NSNull: SerializedDataStorable, SerializedDataStorableFlatValue {}
 
-extension SerializableData: SerializedDataStorable {
-    public func getData() -> SerializableData { return self }
-}
-
-extension Date: SerializedDataStorable {
+extension Date: SerializedDataStorable, SerializedDataStorableFlatValue {
     public func getData() -> SerializableData {
         return SerializableData.safeInit(date: self) // special case
     }
 }
-extension URL: SerializedDataStorable {
+extension URL: SerializedDataStorable, SerializedDataStorableFlatValue {
     public func getData() -> SerializableData {
         return SerializableData.safeInit(self.absoluteString)
     }
+}
+
+extension SerializableData: SerializedDataStorable {
+    public func getData() -> SerializableData { return self }
 }
 
 

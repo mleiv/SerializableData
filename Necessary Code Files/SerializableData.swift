@@ -25,7 +25,6 @@ public enum SerializableDataError : Error {
         print(x["something"]?.double) //Optional(3.05)
 */
 public struct SerializableData {
-//MARK: Contents
     
     internal enum StorageType {
         case none
@@ -75,7 +74,11 @@ public struct SerializableData {
                 for (key, value) in v { a[key] = try SerializableData(value) }
                 contents = .dictionaryType(a)
             case let v as SerializedDataStorable:
-                contents = .valueType(v)
+                if v is SerializedDataStorableFlatValue {
+                    contents = .valueType(v)
+                } else {
+                    self = v.getData()
+                }
             case nil: break
             default: throw SerializableDataError.parsingError
         }
