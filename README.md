@@ -94,6 +94,8 @@ There is also some support for CGFloat and URL, although they don't have XXXLite
     data["cgfloat"].cgFloat == CGFloat(50)
     data["url"].url == URL(string: "http://www.example.com")
 }
+```
+
 
 I will probably add CGSize and CGPoint and CGRect eventually also, because I use those a lot and they are a pain to parse in and out of json.
 
