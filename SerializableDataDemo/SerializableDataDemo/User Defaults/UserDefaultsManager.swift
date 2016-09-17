@@ -11,17 +11,17 @@
 
 import Foundation
 
-public enum UserDefaultsManagerError : ErrorType {
-    case NotFound
-    case FailedToInitializedObject
+public enum UserDefaultsManagerError : Error {
+    case notFound
+    case failedToInitializedObject
 }
 
 /// Not so efficient as CoreData, since it retrieves the whole list of objects, but hey, still works. :/
 public struct UserDefaultsManager {
     
-    public static func save<T: UserDefaultsStorable>(item: T) -> Bool {
+    public static func save<T: UserDefaultsStorable>(_ item: T) -> Bool {
         var all: [T] = getAll()
-        if let index = all.indexOf({ item.isEqual($0) }) {
+        if let index = all.index(where: { item.isEqual($0) }) {
             all[index] = item
         } else {
             all.append(item)
@@ -29,31 +29,32 @@ public struct UserDefaultsManager {
         return saveAll(all)
     }
     
-    private static func saveAll<T: UserDefaultsStorable>(items: [T]) -> Bool {
-        let defaults = NSUserDefaults.standardUserDefaults()
-        defaults.setObject(SerializableData(items.map{ $0.getData() }).serializedString, forKey: T.userDefaultsEntityName)
+    static func saveAll<T: UserDefaultsStorable>(_ items: [T]) -> Bool {
+        let defaults = UserDefaults.standard
+        print(SerializableData.safeInit(items))
+        defaults.set(SerializableData.safeInit(items).serializedString, forKey: T.userDefaultsEntityName)
         return true
     }
     
-    public static func delete<T: UserDefaultsStorable>(item: T) -> Bool {
+    public static func delete<T: UserDefaultsStorable>(_ item: T) -> Bool {
         var all: [T] = getAll()
-        if let index = all.indexOf({ item.isEqual($0) }) {
-            all.removeAtIndex(index)
+        if let index = all.index(where: { item.isEqual($0) }) {
+            all.remove(at: index)
         } else {
             return false
         }
         return saveAll(all)
     }
     
-    public static func get<T: UserDefaultsStorable>(item: T) -> T? {
+    public static func get<T: UserDefaultsStorable>(_ item: T) -> T? {
         let all: [T] = getAll()
         return all.filter{ item.isEqual($0) }.first
     }
     
     public static func getAll<T: UserDefaultsStorable>() -> [T] {
         do {
-            let defaults = NSUserDefaults.standardUserDefaults()
-            if let serializedString = defaults.objectForKey(T.userDefaultsEntityName) as? String {
+            let defaults = UserDefaults.standard
+            if let serializedString = defaults.object(forKey: T.userDefaultsEntityName) as? String {
                 let serializedList = try SerializableData(jsonString: serializedString)
                 let all = (serializedList.array ?? []).map {
                     return T(data: $0)

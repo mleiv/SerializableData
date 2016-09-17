@@ -5,6 +5,17 @@
 //  No license, everyone free to use.
 
 import Foundation
+fileprivate func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l < r
+  case (nil, _?):
+    return true
+  default:
+    return false
+  }
+}
+
 
 extension String {
     /**
@@ -14,18 +25,18 @@ extension String {
         - parameter end:                 (Optional) Where to end (-1 acceptable) - default to end of string
         - returns: String
     */
-    func stringFrom(start: Int, to end: Int? = nil) -> String {
+    func stringFrom(_ start: Int, to end: Int? = nil) -> String {
         var maximum = self.characters.count
         
         let i = start < 0 ? self.endIndex : self.startIndex
         let ioffset = min(maximum, max(-1 * maximum, start))
-        let startIndex = i.advancedBy(ioffset)
+        let startIndex = self.index(i, offsetBy: ioffset)
         
         maximum -= start
         
         let j = end < 0 ? self.endIndex : self.startIndex
         let joffset = min(maximum, max(-1 * maximum, end!))
-        let endIndex = end != nil && end! < self.characters.count ? j.advancedBy(joffset) : self.endIndex
-        return self.substringWithRange(Range(start: startIndex, end: endIndex))
+        let endIndex = end != nil && end! < self.characters.count ? self.index(j, offsetBy: joffset) : self.endIndex
+        return self.substring(with: (startIndex ..< endIndex))
     }
 }

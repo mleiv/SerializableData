@@ -26,27 +26,27 @@ class Spinner {
         //create overlay
         spinnerOverlay = UIView()
         spinnerOverlay.backgroundColor = UIColor(red: 0.5, green: 0.5, blue: 0.5, alpha: 0.5)
-        spinnerOverlay.opaque = false
-        spinnerOverlay.hidden = true
+        spinnerOverlay.isOpaque = false
+        spinnerOverlay.isHidden = true
         parent.view.addSubview(spinnerOverlay)
         
         //size to fit
         spinnerOverlay.translatesAutoresizingMaskIntoConstraints = false
-        spinnerOverlay.leadingAnchor.constraintEqualToAnchor(parent.view.leadingAnchor).active = true
-        spinnerOverlay.trailingAnchor.constraintEqualToAnchor(parent.view.trailingAnchor).active = true
-        spinnerOverlay.topAnchor.constraintEqualToAnchor(parent.view.topAnchor).active = true
-        spinnerOverlay.bottomAnchor.constraintEqualToAnchor(parent.view.bottomAnchor).active = true
+        spinnerOverlay.leadingAnchor.constraint(equalTo: parent.view.leadingAnchor).isActive = true
+        spinnerOverlay.trailingAnchor.constraint(equalTo: parent.view.trailingAnchor).isActive = true
+        spinnerOverlay.topAnchor.constraint(equalTo: parent.view.topAnchor).isActive = true
+        spinnerOverlay.bottomAnchor.constraint(equalTo: parent.view.bottomAnchor).isActive = true
         
         //create spinner
-        let spinner = UIActivityIndicatorView(activityIndicatorStyle: .WhiteLarge)
-        spinner.color = UIColor.whiteColor()
+        let spinner = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
+        spinner.color = UIColor.white
         spinner.startAnimating()
         spinnerOverlay?.addSubview(spinner)
         
         //size to fit
         spinner.translatesAutoresizingMaskIntoConstraints = false
-        spinner.centerXAnchor.constraintEqualToAnchor(spinnerOverlay.centerXAnchor).active = true
-        spinner.centerYAnchor.constraintEqualToAnchor(spinnerOverlay.centerYAnchor).active = true
+        spinner.centerXAnchor.constraint(equalTo: spinnerOverlay.centerXAnchor).isActive = true
+        spinner.centerYAnchor.constraint(equalTo: spinnerOverlay.centerYAnchor).isActive = true
         
         //done!
         isSetup = true
@@ -56,10 +56,10 @@ class Spinner {
         if !isSetup {
             setup()
         }
-        spinnerOverlay?.hidden = false
+        spinnerOverlay?.isHidden = false
     }
     
     func stop() {
-        spinnerOverlay?.hidden = true
+        spinnerOverlay?.isHidden = true
     }
 }

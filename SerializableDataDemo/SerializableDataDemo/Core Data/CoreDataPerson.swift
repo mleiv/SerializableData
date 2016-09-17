@@ -10,8 +10,8 @@ import Foundation
 
 public struct CoreDataPerson {
     
-    public private(set) var createdDate = NSDate()
-    public var modifiedDate = NSDate()
+    public fileprivate(set) var createdDate = Date()
+    public var modifiedDate = Date()
     
     public var name: String
     
@@ -39,8 +39,8 @@ extension CoreDataPerson: SerializedDataStorable {
         list["notes"] = notes
         list["createdDate"] = createdDate
         list["modifiedDate"] = modifiedDate
-        print(SerializableData(list).serializedString)
-        return SerializableData(list)
+//        print(SerializableData(list).serializedString)
+        return SerializableData.safeInit(list)
     }
     
 }
@@ -58,13 +58,13 @@ extension CoreDataPerson: SerializedDataRetrievable {
         setData(data)
     }
     
-    public mutating func setData(data: SerializableData) {
+    public mutating func setData(_ data: SerializableData) {
         //mandatory data (probably already set, but allow it to be set again if setData() was called separately)
         name = data["name"]?.string ?? name
         
         //optional values:
-        createdDate = data["createdDate"]?.date ?? NSDate()
-        modifiedDate = data["modifiedDate"]?.date ?? NSDate()
+        createdDate = data["createdDate"]?.date ?? Date()
+        modifiedDate = data["modifiedDate"]?.date ?? Date()
         profession = data["profession"]?.string
         organization = data["organization"]?.string
         notes = data["notes"]?.string
@@ -88,12 +88,12 @@ extension CoreDataPerson: CoreDataStorable {
 
     public static var coreDataEntityName: String { return "Persons" }
     
-    public func setAdditionalColumns(coreItem: NSManagedObject) {
+    public func setAdditionalColumns(_ coreItem: NSManagedObject) {
         // only save searchable columns, everything else goes in serializedData
         coreItem.setValue(name, forKey: "name")
     }
     
-    public func setIdentifyingPredicate(fetchRequest: NSFetchRequest) {
+    public func setIdentifyingPredicate(_ fetchRequest: NSFetchRequest<NSFetchRequestResult>) {
         fetchRequest.predicate = NSPredicate(format: "(name = %@)", name)
     }
     
@@ -107,7 +107,7 @@ extension CoreDataPerson: CoreDataStorable {
         return isDeleted
     }
     
-    public static func get(name: String) -> CoreDataPerson? {
+    public static func get(_ name: String) -> CoreDataPerson? {
         return CoreDataManager.get(CoreDataPerson(name: name))
     }
     

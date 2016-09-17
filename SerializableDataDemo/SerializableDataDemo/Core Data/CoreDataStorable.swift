@@ -17,9 +17,9 @@ public protocol CoreDataStorable: SerializedDataStorable, SerializedDataRetrieva
     
     var nsManagedObject: NSManagedObject? { get }
     
-    func setIdentifyingPredicate(fetchRequest: NSFetchRequest)
+    func setIdentifyingPredicate(_ fetchRequest: NSFetchRequest<NSFetchRequestResult>)
     
-    func setAdditionalColumns(coreItem: NSManagedObject)
+    func setAdditionalColumns(_ coreItem: NSManagedObject)
     
     mutating func save() -> Bool
     mutating func delete() -> Bool

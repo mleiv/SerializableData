@@ -10,8 +10,8 @@ import Foundation
 
 public struct UserDefaultsPerson {
     
-    public private(set) var createdDate = NSDate()
-    public var modifiedDate = NSDate()
+    public fileprivate(set) var createdDate = Date()
+    public var modifiedDate = Date()
     
     public var name: String
     
@@ -39,7 +39,7 @@ extension UserDefaultsPerson: SerializedDataStorable {
         list["notes"] = notes
         list["createdDate"] = createdDate
         list["modifiedDate"] = modifiedDate
-        return SerializableData(list)
+        return SerializableData.safeInit(list)
     }
     
 }
@@ -57,13 +57,13 @@ extension UserDefaultsPerson: SerializedDataRetrievable {
         setData(data)
     }
     
-    public mutating func setData(data: SerializableData) {
+    public mutating func setData(_ data: SerializableData) {
         //mandatory data (probably already set, but allow it to be set again if setData() was called separately)
         name = data["name"]?.string ?? name
         
         //optional values:
-        createdDate = data["createdDate"]?.date ?? NSDate()
-        modifiedDate = data["modifiedDate"]?.date ?? NSDate()
+        createdDate = data["createdDate"]?.date ?? Date()
+        modifiedDate = data["modifiedDate"]?.date ?? Date()
         profession = data["profession"]?.string
         organization = data["organization"]?.string
         notes = data["notes"]?.string
@@ -85,7 +85,7 @@ extension UserDefaultsPerson: UserDefaultsStorable {
 
     public static var userDefaultsEntityName: String { return "Persons" }
     
-    public func isEqual<T : UserDefaultsStorable>(item: T) -> Bool {
+    public func isEqual<T : UserDefaultsStorable>(_ item: T) -> Bool {
         if let item = item as? UserDefaultsPerson {
             return item.name == name
         }
@@ -105,7 +105,7 @@ extension UserDefaultsPerson: UserDefaultsStorable {
     
     // we do not delete data
     
-    public static func get(name: String) -> UserDefaultsPerson? {
+    public static func get(_ name: String) -> UserDefaultsPerson? {
         return UserDefaultsManager.get(UserDefaultsPerson(name: name))
     }
     

@@ -18,7 +18,7 @@ class UserDefaultsPersonsController: UITableViewController {
         super.viewDidLoad()
     }
     
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         loadData()
         // expand header
@@ -35,51 +35,51 @@ class UserDefaultsPersonsController: UITableViewController {
     
     // MARK: - Table view data source
 
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
 
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return persons.count
     }
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if let indexPath = tableView.indexPathForSelectedRow where indexPath.row < persons.count {
-            let person = persons[indexPath.row]
-            if let controller = segue.destinationViewController as? UserDefaultsPersonController {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let indexPath = tableView.indexPathForSelectedRow , (indexPath as NSIndexPath).row < persons.count {
+            let person = persons[(indexPath as NSIndexPath).row]
+            if let controller = segue.destination as? UserDefaultsPersonController {
                 controller.person = person
             }
         }
-        super.prepareForSegue(segue, sender: sender)
+        super.prepare(for: segue, sender: sender)
     }
     
-    override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-        if editingStyle == .Delete {
-            if indexPath.row < persons.count {
-                view.userInteractionEnabled = false
-                var person = persons.removeAtIndex(indexPath.row)
-                person.delete()
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            if (indexPath as NSIndexPath).row < persons.count {
+                view.isUserInteractionEnabled = false
+                var person = persons.remove(at: (indexPath as NSIndexPath).row)
+                _ = person.delete()
                 tableView.beginUpdates()
-                tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Automatic)
+                tableView.deleteRows(at: [indexPath], with: UITableViewRowAnimation.automatic)
                 tableView.endUpdates()
-                view.userInteractionEnabled = true
+                view.isUserInteractionEnabled = true
             }
         }
     }
     
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("Person", forIndexPath: indexPath)
-        if indexPath.row < persons.count {
-            let person = persons[indexPath.row]
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Person", for: indexPath)
+        if (indexPath as NSIndexPath).row < persons.count {
+            let person = persons[(indexPath as NSIndexPath).row]
             cell.textLabel?.text = person.name
             var titleParts = [String]()
-            if let profession = person.profession where profession.isEmpty == false {
+            if let profession = person.profession , profession.isEmpty == false {
                 titleParts.append(profession)
             }
-            if let organization = person.organization where organization.isEmpty == false {
+            if let organization = person.organization , organization.isEmpty == false {
                 titleParts.append("@\(organization)")
             }
-            cell.detailTextLabel?.text = titleParts.joinWithSeparator(" ")
+            cell.detailTextLabel?.text = titleParts.joined(separator: " ")
         }
         return cell
     }

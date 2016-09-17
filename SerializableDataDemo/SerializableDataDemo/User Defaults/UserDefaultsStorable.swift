@@ -15,7 +15,7 @@ public protocol UserDefaultsStorable: SerializedDataStorable, SerializedDataRetr
 
     static var userDefaultsEntityName: String { get }
     
-    func isEqual<T:UserDefaultsStorable>(item: T) -> Bool
+    func isEqual<T:UserDefaultsStorable>(_ item: T) -> Bool
     
     mutating func save() -> Bool
     mutating func delete() -> Bool

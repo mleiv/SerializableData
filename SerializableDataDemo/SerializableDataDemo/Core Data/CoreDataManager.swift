@@ -12,9 +12,9 @@
 import UIKit
 import CoreData
 
-public enum CoreDataManagerError : ErrorType {
-    case NotFound
-    case FailedToInitializedObject
+public enum CoreDataManagerError : Error {
+    case notFound
+    case failedToInitializedObject
 }
 
 public struct CoreDataManager {
@@ -26,17 +26,17 @@ public struct CoreDataManager {
     }
 
     /// save a single row
-    public static func save<T: CoreDataStorable>(item: T) -> Bool {
+    public static func save<T: CoreDataStorable>(_ item: T) -> Bool {
         guard let context = self.context else {
             print("Error: could not initalize core data context")
             return false
         }
-        guard let entity = NSEntityDescription.entityForName(T.coreDataEntityName, inManagedObjectContext: context) else {
+        guard let entity = NSEntityDescription.entity(forEntityName: T.coreDataEntityName, in: context) else {
             print("Error: could not find core data entity \(T.coreDataEntityName)")
             return false
         }
         
-        let coreItem = fetchRow(item) ?? NSManagedObject(entity: entity, insertIntoManagedObjectContext: context)
+        let coreItem = fetchRow(item) ?? NSManagedObject(entity: entity, insertInto: context)
 
         coreItem.setValue(item.getData().serializedString, forKey: Keys.serializedData)
         
@@ -54,7 +54,7 @@ public struct CoreDataManager {
     
     
     /// delete single row with item passed
-    public static func delete<T: CoreDataStorable>(item: T) -> Bool {
+    public static func delete<T: CoreDataStorable>(_ item: T) -> Bool {
         guard let context = self.context else {
             print("Error: could not initalize core data context")
             return false
@@ -62,7 +62,7 @@ public struct CoreDataManager {
         
         do {
             if let coreItem = item.nsManagedObject {
-                context.deleteObject(coreItem)
+                context.delete(coreItem)
                 try context.save()
                 return true
             }
@@ -75,14 +75,14 @@ public struct CoreDataManager {
     
     /// get a single row
     /// (I have a much better way of doing this with predicates, but it is long and requires lots of additional protocols, so again, EXAMPLE ONLY, lol)
-    public static func get<T: CoreDataStorable>(item: T) -> T? {
+    public static func get<T: CoreDataStorable>(_ item: T) -> T? {
         do {
             if let coreItem = fetchRow(item) {
-                let serializedString = (coreItem.valueForKey(Keys.serializedData) as? String) ?? ""
+                let serializedString = (coreItem.value(forKey: Keys.serializedData) as? String) ?? ""
                 if let t = T(serializedString: serializedString) {
                     return t
                 } else {
-                    throw CoreDataManagerError.FailedToInitializedObject
+                    throw CoreDataManagerError.failedToInitializedObject
                 }
             }
         } catch let fetchError as NSError {
@@ -99,16 +99,16 @@ public struct CoreDataManager {
             return []
         }
         
-        let fetchRequest = NSFetchRequest(entityName: T.coreDataEntityName)
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: T.coreDataEntityName)
         
         do {
-            let coreItems = (try context.executeFetchRequest(fetchRequest) as? [NSManagedObject]) ?? [NSManagedObject]()
+            let coreItems = (try context.fetch(fetchRequest) as? [NSManagedObject]) ?? [NSManagedObject]()
             let results: [T] = try coreItems.map { (coreItem) in
-                let serializedString = (coreItem.valueForKey(Keys.serializedData) as? String) ?? ""
+                let serializedString = (coreItem.value(forKey: Keys.serializedData) as? String) ?? ""
                 if let t = T(serializedString: serializedString) {
                     return t
                 } else {
-                    throw CoreDataManagerError.FailedToInitializedObject
+                    throw CoreDataManagerError.failedToInitializedObject
                 }
             }
             return results
@@ -120,18 +120,18 @@ public struct CoreDataManager {
     }
 
     /// retrieve single row introspective core data
-    public static func fetchRow<T: CoreDataStorable>(item: T) -> NSManagedObject? {
+    public static func fetchRow<T: CoreDataStorable>(_ item: T) -> NSManagedObject? {
         guard let context = self.context else {
             print("Error: could not initalize core data context")
             return nil
         }
         
-        let fetchRequest = NSFetchRequest(entityName: T.coreDataEntityName)
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: T.coreDataEntityName)
         fetchRequest.fetchLimit = 1
         item.setIdentifyingPredicate(fetchRequest)
         
         do {
-            let coreItems = (try context.executeFetchRequest(fetchRequest) as? [NSManagedObject]) ?? [NSManagedObject]()
+            let coreItems = (try context.fetch(fetchRequest) as? [NSManagedObject]) ?? [NSManagedObject]()
             return coreItems.first
         } catch let fetchError as NSError {
             print("fetchRow failed for \(T.coreDataEntityName): \(fetchError.localizedDescription)")

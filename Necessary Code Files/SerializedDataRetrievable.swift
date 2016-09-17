@@ -17,7 +17,7 @@ import Foundation
 public protocol SerializedDataRetrievable {
     init?(data: SerializableData?) // implement this
     init?(serializedString json: String) // implement in class (not required in struct)
-    init?(serializedData jsonData: NSData) // implement in class (not required in struct)
+    init?(serializedData jsonData: Data) // implement in class (not required in struct)
 }
 
 // default protocol functions:
@@ -26,7 +26,7 @@ extension SerializedDataRetrievable {
     public init?(serializedString json: String) {
         self.init(data: try? SerializableData(jsonString: json))
     }
-    public init?(serializedData jsonData: NSData) {
+    public init?(serializedData jsonData: Data) {
         self.init(data: try? SerializableData(jsonData: jsonData))
     }
     /*
@@ -44,7 +44,7 @@ extension SerializedDataRetrievable where Self: SerializedDataStorable {
     public var serializedString: String {
         get { return getData().jsonString }
     }
-    public var serializedData: NSData? {
-        get { return getData().nsData }
+    public var serializedData: Data? {
+        get { return getData().nsData as Data? }
     }
 }

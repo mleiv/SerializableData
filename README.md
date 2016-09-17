@@ -1,6 +1,6 @@
 # SerializableData
 
-**An easy Swift 2.0 library to get/set json-type data, usable in NSUserDefaults and CoreData**
+**An easy Swift 3.0 library to get/set json-type data, usable in NSUserDefaults and CoreData**
 
 ## Including in Your App
 
@@ -11,6 +11,10 @@ There is no CocoaPods or Carthage installation option. If you want this, just co
 * SerializedDataRetrievable.swift
 * StringExtension.swift
 * DictionaryExtension.swift
+
+## News 2016-09-17
+
+Upgraded to Swift 3.0. It was a bit rushed, so some functionality has changed or been disabled. I added SerializableData.safeInit() as a non-throwing version of SerializableData() - it returns a null data object when it fails. .getData() no longer works on arrays or dictionaries, but they are currently initializing better via the standard SerializableData() anyway.
 
 ## News 2015-11-10
 
@@ -59,8 +63,8 @@ You can extract these values back out using .string, .int, .float, .double, .nsN
     list["var1"] = "String"
     list["var2"] = 5
     list["var3"] = 56.7
-    list["var4"] = [1,2,3].getData()
-    let data = SerializableData(list)
+    list["var4"] = SerializableData.safeInit([1,2,3])
+    let data = SerializableData.safeInit(list)
     print(data.serializedString)
     data["var1"]?.string == "String"
     data["var3"]?.double == 56.7
@@ -70,25 +74,25 @@ I did not bother to make SerializableData adhere to any of the collection protoc
 
 ```swift
 
-	var data = SerializableData()
-	data["myArray"] = [1,2,3]
-	data["myDictionary"] = ["k1": "v1", "k2": "v2"]
+    var data = SerializableData()
+    data["myArray"] = [1,2,3]
+    data["myDictionary"] = ["k1": "v1", "k2": "v2"]
     let optionalArray: [Int?] = (data["myArray"]?.array ?? []).map{ $0.int } 
     for (key, value) in (data["myDictionary"]?.dictionary ?? [:]) {
-    	print("\(key) = \(value.string)")
+    	  print("\(key) = \(value.string)")
     }
 }
 ```
 
-There is also some support for CGFloat and NSURL, although they don't have XXXLiteralConvertible protocols, so you have to work a bit harder.
+There is also some support for CGFloat and URL, although they don't have XXXLiteralConvertible protocols, so you have to work a bit harder.
 
 ```swift
 
-	var data = SerializableData()
-	data["cgfloat"] = CGFloat(50).getData()
-	data["url"] = NSURL(string: "http://www.example.com")?.getData()
+    var data = SerializableData()
+    data["cgfloat"] = CGFloat(50).getData()
+    data["url"] = URL(string: "http://www.example.com")?.getData()
     data["cgfloat"].cgFloat == CGFloat(50)
-    data["url"].url == NSURL(string: "http://www.example.com")
+    data["url"].url == URL(string: "http://www.example.com")
 }
 
 I will probably add CGSize and CGPoint and CGRect eventually also, because I use those a lot and they are a pain to parse in and out of json.
@@ -101,16 +105,16 @@ Using the SerializedDataStorable and SerializedDataRetrievable protocols, you ca
 ```swift
 
 	public struct MyStruct: SerializedDataStorable, SerializedDataRetrievable {
-		public var myProp1: String = "Test"
-		public var myDataSubClass: MyDataSubClass = MyDataSubClass(myNestedProp1: "Something")
-		public var myOptionalProp2: Int? = 5
+	    public var myProp1: String = "Test"
+	    public var myDataSubClass: MyDataSubClass = MyDataSubClass(myNestedProp1: "Something")
+	    public var myOptionalProp2: Int? = 5
 
 	    public func getData() -> SerializableData {
 	        var list = [String: SerializedDataStorable?]()
 	        list["myProp1"] = myProp1
 	        list["myOptionalProp2"] = myOptionalProp2
 	        list["myDataSubClass"] = myDataSubClass
-	        return SerializableData(list)
+	        return SerializableData.safeInit(list)
 	    }
 
 	    public init() {}
@@ -144,7 +148,7 @@ Using the SerializedDataStorable and SerializedDataRetrievable protocols, you ca
 	    public func getData() -> SerializableData {
 	        var list = [String: SerializedDataStorable?]()
 	        list["myNestedProp1"] = myNestedProp1
-	        return SerializableData(list)
+	        return SerializableData.safeInit(list)
 	    }
         
 	    public init(myNestedProp1: String) {
@@ -183,7 +187,7 @@ When you create SerializableData data sets, you can get and set data pretty easi
     serializableData["test1"] = "test"
     serializableData["number1"] = 5.01
     serializableData["bool1"] = true
-    serializableData["date1"] = SerializableData(date: NSDate()) // dates are tricky
+    serializableData["date1"] = SerializableData.safeInit(date: NSDate()) // dates are tricky
     serializableData["array1"] = [1, 5]
     serializableData["dictionary1"] = ["key1": 1, "key2": 5]
     serializableData["dictionary1"]?["key1"] = 6

@@ -30,7 +30,7 @@ extension SerializedDataStorable {
         }
         var data = SerializableData()
         if !(self is NSNull) {
-            data.contents = .ValueType(self)
+            data.contents = .valueType(self)
         }
         return data
     }
@@ -52,26 +52,26 @@ extension SerializableData: SerializedDataStorable {
     public func getData() -> SerializableData { return self }
 }
 
-extension NSDate: SerializedDataStorable {
+extension Date: SerializedDataStorable {
     public func getData() -> SerializableData {
-        return SerializableData(date: self) // special case
+        return SerializableData.safeInit(date: self) // special case
     }
 }
-extension NSURL: SerializedDataStorable {
+extension URL: SerializedDataStorable {
     public func getData() -> SerializableData {
-        return SerializableData(self.absoluteString)
+        return SerializableData.safeInit(self.absoluteString)
     }
 }
 
 
 // You cannot declare Array/Dictionary -both- SerializedDataStorable and containing SerializedDataStorable type (it's one or the other)
-extension SequenceType where Generator.Element == (T: String, U: SerializedDataStorable?) {
-    func getData() -> SerializableData {
-        return SerializableData( Dictionary( map { ($0.0, SerializableData($0.1) ) } ) )
-    }
-}
-extension SequenceType where Generator.Element == SerializedDataStorable? {
-    func getData() -> SerializableData {
-        return SerializableData( Array( map { SerializableData($0) } ) )
-    }
-}
+//extension Sequence where Iterator.Element == (T: String, U: SerializedDataStorable?) {
+//    func getData() -> SerializableData {
+//        return SerializableData( Dictionary( map { ($0.0, SerializableData($0.1) ) } ) )
+//    }
+//}
+//extension Sequence where Iterator.Element == SerializedDataStorable? {
+//    func getData() -> SerializableData {
+//        return SerializableData( Array( map { SerializableData($0) } ) )
+//    }
+//}

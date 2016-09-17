@@ -28,7 +28,7 @@ class UserDefaultsPersonController: UIViewController {
         if person.name.isEmpty == false {
             isNew = false
         }
-        deleteButton.hidden = isNew
+        deleteButton.isHidden = isNew
         setFieldValues()
         spinner?.stop()
     }
@@ -38,15 +38,15 @@ class UserDefaultsPersonController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
 
-    @IBAction func savePerson(sender: UIButton) {
+    @IBAction func savePerson(_ sender: UIButton) {
         spinner?.start()
         saveFieldValues()
         let name = person.name
         if name.isEmpty == false {
-            person.save()
+            _ = person.save()
             showMessage("Saved \(name).", handler: { _ in
                 self.spinner?.stop()
-                self.navigationController?.popViewControllerAnimated(true)
+                _ = self.navigationController?.popViewController(animated: true)
             })
         } else {
             showMessage("Please enter a name before saving.", handler: { _ in
@@ -55,18 +55,18 @@ class UserDefaultsPersonController: UIViewController {
         }
     }
 
-    @IBAction func deletePerson(sender: UIButton) {
+    @IBAction func deletePerson(_ sender: UIButton) {
         spinner?.start()
         let name = person.name
-        person.delete()
+        _ = person.delete()
         showMessage("Deleted \(name).", handler: { _ in
             self.spinner?.stop()
-            self.navigationController?.popViewControllerAnimated(true)
+            _ = self.navigationController?.popViewController(animated: true)
         })
     }
     
     func setFieldValues() {
-        nameField.text = person.name ?? ""
+        nameField.text = person.name
         professionField.text = person.profession
         organizationField.text = person.organization
         notesField.text = person.notes
@@ -79,9 +79,9 @@ class UserDefaultsPersonController: UIViewController {
         person.notes = notesField.text
     }
     
-    func showMessage(message: String, handler: ((UIAlertAction) -> Void) = { _ in }) {
-        let alertController = UIAlertController(title: nil, message: message, preferredStyle: .Alert)
-        alertController.addAction(UIAlertAction(title: "Okay", style: .Default, handler: handler))
-        self.presentViewController(alertController, animated: true) {}
+    func showMessage(_ message: String, handler: @escaping ((UIAlertAction) -> Void) = { _ in }) {
+        let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "Okay", style: .default, handler: handler))
+        self.present(alertController, animated: true) {}
     }
 }

@@ -11,15 +11,15 @@ import XCTest
 
 class SerializableDataDemoTests: XCTestCase {
 
-    let sampleJson = "{\"persons\":[{\"name\" : \"Phil Myman\", \"profession\" : \"R&D Lab Scientist\", \"organization\" : \"Veridian Dynamics\", \"notes\" : \"You know what you did.\", \"createdDate\" : \"2009-03-18 19:05:15\", \"modifiedDate\" : \"2010-01-26 20:00:09\"}, {\"name\" : \"Veronica Palmer\", \"profession\" : \"Executive\", \"organization\" : \"Veridian Dynamics\", \"notes\" : \"Friendship. It's the same as stealing.\", \"createdDate\" : \"2009-03-18 19:00:07\", \"modifiedDate\" : \"2010-01-26 23:17:20\"}]}"
-    let oneDay = NSTimeInterval(24 * 60 * 60)
-    var sevenYearsAgo = NSDate()
-    var fiveYearsAgo = NSDate()
+    let sampleJson = "{\"persons\":[{\"name\" : \"Phil Myman\", \"profession\" : \"R&D Lab Scientist\", \"organization\" : \"Veridian Dynamics\", \"notes\" : \"You know what you did.\", \"createdDate\" : \"2010-03-18 19:05:15\", \"modifiedDate\" : \"2010-01-26 20:00:09\"}, {\"name\" : \"Veronica Palmer\", \"profession\" : \"Executive\", \"organization\" : \"Veridian Dynamics\", \"notes\" : \"Friendship. It's the same as stealing.\", \"createdDate\" : \"2010-03-18 19:00:07\", \"modifiedDate\" : \"2010-01-26 23:17:20\"}]}"
+    let oneDay = TimeInterval(24 * 60 * 60)
+    var sevenYearsAgo = Date()
+    var fiveYearsAgo = Date()
     
     override func setUp() {
         super.setUp()
-        sevenYearsAgo = NSDate(timeIntervalSinceNow: (-self.oneDay) * 365 * 7)
-        fiveYearsAgo = NSDate(timeIntervalSinceNow: (-self.oneDay) * 365 * 5)
+        sevenYearsAgo = Date(timeIntervalSinceNow: (-self.oneDay) * 365 * 7)
+        fiveYearsAgo = Date(timeIntervalSinceNow: (-self.oneDay) * 365 * 5)
     }
     
     override func tearDown() {
@@ -27,13 +27,13 @@ class SerializableDataDemoTests: XCTestCase {
     }
     
     func testNsData() {
-        if let jsonData = (sampleJson as NSString).dataUsingEncoding(NSUTF8StringEncoding) {
+        if let jsonData = (sampleJson as NSString).data(using: String.Encoding.utf8.rawValue) {
             if let serializableData = try? SerializableData(jsonData: jsonData) {
                 if let personsList = serializableData["persons"]?.array {
                     XCTAssert(personsList[0]["name"]?.string == "Phil Myman", "Lost Phil's name")
                     XCTAssert(personsList[1]["name"]?.string == "Veronica Palmer", "Lost Veronica's name")
-                    let philsStartDate = personsList[0]["createdDate"]?.date ?? NSDate()
-                    XCTAssert(philsStartDate.compare(sevenYearsAgo) == .OrderedDescending && philsStartDate.compare(fiveYearsAgo) == .OrderedAscending, "Misread Phil's start date")
+                    let philsStartDate = personsList[0]["createdDate"]?.date ?? Date()
+                    XCTAssert(philsStartDate.compare(sevenYearsAgo) == .orderedDescending && philsStartDate.compare(fiveYearsAgo) == .orderedAscending, "Misread Phil's start date")
                 } else {
                     XCTAssert(false, "Failed to recover array")
                 }
@@ -51,8 +51,8 @@ class SerializableDataDemoTests: XCTestCase {
             if let personsList = serializableData["persons"]?.array {
                 XCTAssert(personsList[0]["name"]?.string == "Phil Myman", "Lost Phil's name")
                 XCTAssert(personsList[1]["name"]?.string == "Veronica Palmer", "Lost Veronica's name")
-                let philsStartDate = personsList[0]["createdDate"]?.date ?? NSDate()
-                    XCTAssert(philsStartDate.compare(sevenYearsAgo) == .OrderedDescending && philsStartDate.compare(fiveYearsAgo) == .OrderedAscending, "Misread Phil's start date")
+                let philsStartDate = personsList[0]["createdDate"]?.date ?? Date()
+                    XCTAssert(philsStartDate.compare(sevenYearsAgo) == .orderedDescending && philsStartDate.compare(fiveYearsAgo) == .orderedAscending, "Misread Phil's start date")
             } else {
                 XCTAssert(false, "Failed to recover array")
             }
@@ -63,15 +63,15 @@ class SerializableDataDemoTests: XCTestCase {
     
     
     func testRepeatedConversions(){
-        if let jsonData = (sampleJson as NSString).dataUsingEncoding(NSUTF8StringEncoding) {
+        if let jsonData = (sampleJson as NSString).data(using: String.Encoding.utf8.rawValue) {
             do {
                 let serializableData = try SerializableData(jsonData: jsonData)
                 let serializableData2 = try SerializableData(jsonString: serializableData.jsonString)
                 if let personsList = serializableData2["persons"]?.array {
                     XCTAssert(personsList[0]["name"]?.string == "Phil Myman", "Lost Phil's name")
                     XCTAssert(personsList[1]["name"]?.string == "Veronica Palmer", "Lost Veronica's name")
-                    let philsStartDate = personsList[0]["createdDate"]?.date ?? NSDate()
-                    XCTAssert(philsStartDate.compare(sevenYearsAgo) == .OrderedDescending && philsStartDate.compare(fiveYearsAgo) == .OrderedAscending, "Misread Phil's start date")
+                    let philsStartDate = personsList[0]["createdDate"]?.date ?? Date()
+                    XCTAssert(philsStartDate.compare(sevenYearsAgo) == .orderedDescending && philsStartDate.compare(fiveYearsAgo) == .orderedAscending, "Misread Phil's start date")
                 } else {
                     XCTAssert(false, "Failed to recover array")
                 }
@@ -94,17 +94,17 @@ class SerializableDataDemoTests: XCTestCase {
         XCTAssert(serializableData["number2"]?.double == 5.01, "Did not correctly set Double value")
         serializableData["bool1"] = true
         XCTAssert(serializableData["bool1"]?.bool == true, "Did not correctly set Bool value")
-        serializableData["date1"] = SerializableData(date: fiveYearsAgo) // dates are tricky
+        serializableData["date1"] = SerializableData.safeInit(date: fiveYearsAgo) // dates are tricky
         print("\(serializableData["date1"]?.date) \(fiveYearsAgo)")
-        XCTAssert(stringFromDate(serializableData["date1"]?.date ?? NSDate()) == stringFromDate(fiveYearsAgo), "Did not correctly set Date value")
+        XCTAssert(stringFromDate(serializableData["date1"]?.date ?? Date()) == stringFromDate(fiveYearsAgo), "Did not correctly set Date value")
         // it is also hard to compare dates - they report the same up to second, but still don't ==
         serializableData["array1"] = [1, 5]
         XCTAssert(serializableData["array1"]?[1] == 5, "Did not correctly set Array value")
         serializableData["dictionary1"] = ["key1": 1, "key2": 5]
         XCTAssert(serializableData["dictionary1"]?["key2"] == 5, "Did not correctly set Dictionary value")
-        let serializedArray = [1,2,5].getData()
+        let serializedArray: SerializableData = [1,2,5]
         XCTAssert(serializedArray.jsonString == "[\n  1,\n  2,\n  5\n]", "Did not correctly serialize an Array")
-        let serializedDictionary = ["key1": "value1"].getData()
+        let serializedDictionary: SerializableData = ["key1": "value1"]
         XCTAssert(serializedDictionary.jsonString == "{\n  \"key1\" : \"value1\"\n}", "Did not correctly serialize a Dictionary")
     }
     
@@ -126,11 +126,11 @@ class SerializableDataDemoTests: XCTestCase {
         // sorry, this won't work
 //        serializableData["url"] = NSURL(string: "http://example.com/")
         // but this will
-        let nsUrl = NSURL(string: "http://example.com/")
+        let nsUrl = URL(string: "http://example.com/")
         serializableData["url"] = nsUrl?.getData()
         // and so will this:
-        let urls: [SerializedDataStorable?] = [nsUrl, NSURL(string: "http://yahoo.com/")]
-        serializableData["urls"] = SerializableData(urls)
+        let urls: [SerializedDataStorable?] = [nsUrl, URL(string: "http://yahoo.com/")]
+        serializableData["urls"] = SerializableData.safeInit(urls)
         XCTAssert(serializableData["url"]?.url == nsUrl, "Did not correctly serialize CGFloat")
         XCTAssert(serializableData["urls"]?[0]?.url == nsUrl, "Did not correctly serialize CGFloat Array")
     }
@@ -148,9 +148,9 @@ class SerializableDataDemoTests: XCTestCase {
                     XCTAssert(false, "Failed to retrieve array from file")
                 }
                 if retrievedData.delete(fileName: fileName) {
-                    if let documents = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true).first {
-                        let path = (documents as NSString).stringByAppendingPathComponent(fileName)
-                        XCTAssert(NSFileManager.defaultManager().fileExistsAtPath(path) == false, "Reported file delete but file exists")
+                    if let documents = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first {
+                        let path = (documents as NSString).appendingPathComponent(fileName)
+                        XCTAssert(FileManager.default.fileExists(atPath: path) == false, "Reported file delete but file exists")
                     } else {
                         XCTAssert(false, "Problem with documents folder")
                     }
@@ -165,11 +165,11 @@ class SerializableDataDemoTests: XCTestCase {
         }
     }
     
-    func stringFromDate(value: NSDate) -> String? {
-        let dateFormatter = NSDateFormatter()
+    func stringFromDate(_ value: Date) -> String? {
+        let dateFormatter = DateFormatter()
         //add more flexible parsing later
         dateFormatter.dateFormat = "YYYY-MM-dd HH:mm:ss"
-        dateFormatter.timeZone = NSTimeZone(abbreviation: "UTC")
-        return dateFormatter.stringFromDate(value)
+        dateFormatter.timeZone = TimeZone(abbreviation: "UTC")
+        return dateFormatter.string(from: value)
     }
 }
