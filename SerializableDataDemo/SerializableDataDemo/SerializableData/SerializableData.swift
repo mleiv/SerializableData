@@ -101,13 +101,23 @@ public struct SerializableData {
        return (try? SerializableData(date: date)) ?? SerializableData()
     }
     
+    /// - Parameter data: does date to string conversion before storing value
+    public init(data: Data) throws {
+        let sData = data.base64EncodedString()
+        contents = .valueType(sData)
+    }
+    
+    public static func safeInit(data: Data) -> SerializableData {
+       return (try? SerializableData(data: data)) ?? SerializableData()
+    }
+    
     /// Note: You probably want to run this on a background thread for large data
     /// - Parameter fileName: a file inside documents folder, presumably of json format
     public init(fileName: String) throws {
         if let documents = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first {
             let path = (documents as NSString).appendingPathComponent(fileName)
-            if let data = try? Data(contentsOf: URL(fileURLWithPath: path)) {
-                try self.init(jsonData: data)
+            if let d = try? Data(contentsOf: URL(fileURLWithPath: path)) {
+                try self.init(jsonData: d)
                 return
             }
         }
@@ -115,15 +125,15 @@ public struct SerializableData {
     }
 
     /// Note: You probably want to run this on a background thread for large data
-    /// - Parameter jsonData: parses a json list of NSData format. Throws error if it can't parse it/make it SerializableData.
+    /// - Parameter jsonData: parses a json list of Data format. Throws error if it can't parse it/make it SerializableData.
     public init(jsonData: Data) throws {
         try self.init(serializedData: jsonData)
     }
     
-    public init(serializedData nsData: Data) throws {
+    public init(serializedData data: Data) throws {
         do {
-            let data = try JSONSerialization.jsonObject(with: nsData, options: JSONSerialization.ReadingOptions.allowFragments)
-            try self.init(data)
+            let d = try JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions.allowFragments)
+            try self.init(d)
         } catch {
             throw SerializableDataError.parsingError
         }
@@ -159,20 +169,22 @@ extension SerializableData {
             }
             let s = String(describing: v)
             // fun times: json is often ambiguous about whether it's a string or a number
-            if let tValue = NSString(string: s).boolValue as? T {
+            if Bool.self == T.self, let tValue = NSString(string: s).boolValue as? T {
                 return tValue
-            } else if let tValue = formatter.number(from: s)?.intValue as? T {
+            } else if Int.self == T.self, let tValue = formatter.number(from: s)?.intValue as? T {
                 return tValue
-            } else if let tValue = formatter.number(from: s)?.floatValue as? T {
+            } else if Float.self == T.self, let tValue = formatter.number(from: s)?.floatValue as? T {
                 return tValue
-            } else if let tValue = formatter.number(from: s)?.doubleValue as? T {
+            } else if Double.self == T.self, let tValue = formatter.number(from: s)?.doubleValue as? T {
                 return tValue
-            } else if let v = formatter.number(from: s)?.doubleValue,
+            } else if CGFloat.self == T.self, let v = formatter.number(from: s)?.doubleValue,
                       let tValue = CGFloat(v) as? T {
                 return tValue
-            } else if let tValue = dateFromString(s) as? T {
+            } else if Date.self == T.self, let tValue = dateFromString(s) as? T {
                 return tValue
-            } else if let tValue = URL(string: s) as? T {
+            } else if URL.self == T.self, let tValue = URL(string: s) as? T {
+                return tValue
+            } else if Data.self == T.self, let tValue = Data(base64Encoded: s, options: .ignoreUnknownCharacters) as? T {
                 return tValue
             } else if let tValue = formatter.number(from: s) as? T { //NSNumber
                 return tValue
@@ -209,10 +221,12 @@ extension SerializableData {
     public var cgFloat: CGFloat? { return value() as CGFloat? }
     /// - Returns: Optional(NSNumber) if this object can be converted to one
     public var nsNumber: NSNumber? { return value() as NSNumber? }
-    /// - Returns: Optional(NSURL) if this object can be converted to one
+    /// - Returns: Optional(URL) if this object can be converted to one
     public var url: URL? { return value() as URL? }
-    /// - Returns: Optional(NSDate) if this object can be converted to one
+    /// - Returns: Optional(Date) if this object can be converted to one
     public var date: Date? { return value() as Date? }
+    /// - Returns: Optional(Data) if this object can be converted to one
+    public var data: Data? { return value() as Data? }
     /// - Returns: Optional(NSDate) if this object can be converted to one
     public var isNil: Bool { return contents == StorageType.none }
     
@@ -322,7 +336,7 @@ extension SerializableData {
     /// - Parameter fileName: writes file of this name to documents folder; can be retrieved via init(file:)
     /// - Returns: true if write was a success
     public func store(fileName: String) -> Bool {
-        guard let data = nsData,
+        guard let data = toData(),
            let documents = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first
         else {
             return false
@@ -372,8 +386,11 @@ extension SerializableData {
         }
     }
 
-    /// - Returns: An NSData object
     public var nsData: Data? {
+        return toData()
+    }
+    /// - Returns: A Data object
+    public func toData() -> Data? {
         if case .none = contents {
             // can't make a json object with *just* nil (NSNull inside array/dictionary is okay)
             return nil
@@ -393,7 +410,7 @@ extension SerializableData {
         case .valueType(let v): return "\(v)"
         case .dictionaryType(_): fallthrough
         case .arrayType(_):
-            if let d = nsData, let jsonString = String(data: d, encoding: String.Encoding.utf8) {
+            if let d = toData(), let jsonString = String(data: d, encoding: String.Encoding.utf8) {
                 return jsonString
             }
             fallthrough
@@ -463,53 +480,53 @@ extension SerializableData {
 //MARK: LiteralConvertible Protocols
 
 extension SerializableData: ExpressibleByNilLiteral {
-	public init(nilLiteral: ()) {
+    public init(nilLiteral: ()) {
     }
 }
 extension SerializableData: ExpressibleByStringLiteral {
-	public init(stringLiteral s: StringLiteralType) {
+    public init(stringLiteral s: StringLiteralType) {
         contents = .valueType(s)
-	}
-	public init(extendedGraphemeClusterLiteral s: StringLiteralType) {
+    }
+    public init(extendedGraphemeClusterLiteral s: StringLiteralType) {
         contents = .valueType(s)
-	}
-	public init(unicodeScalarLiteral s: StringLiteralType) {
+    }
+    public init(unicodeScalarLiteral s: StringLiteralType) {
         contents = .valueType(s)
-	}
+    }
 }
 extension SerializableData: ExpressibleByIntegerLiteral {
-	public init(integerLiteral i: IntegerLiteralType) {
+    public init(integerLiteral i: IntegerLiteralType) {
         contents = .valueType(i)
-	}
+    }
 }
 extension SerializableData: ExpressibleByFloatLiteral {
-	public init(floatLiteral f: FloatLiteralType) {
+    public init(floatLiteral f: FloatLiteralType) {
         contents = .valueType(f)
-	}
+    }
 }
 extension SerializableData: ExpressibleByBooleanLiteral {
-	public init(booleanLiteral b: BooleanLiteralType) {
+    public init(booleanLiteral b: BooleanLiteralType) {
         contents = .valueType(b)
-	}
+    }
 }
 extension SerializableData:  ExpressibleByDictionaryLiteral {
     public typealias Key = String
     public typealias Value = SerializedDataStorable
-	public init(dictionaryLiteral tuples: (Key, Value)...) {
+    public init(dictionaryLiteral tuples: (Key, Value)...) {
         contents = .dictionaryType(Dictionary(tuples.map { ($0.0, $0.1.getData()) }))
-	}
-	public init(dictionaryLiteral tuples: (Key, Value?)...) {
+    }
+    public init(dictionaryLiteral tuples: (Key, Value?)...) {
         contents = .dictionaryType(Dictionary(tuples.map { ($0.0, $0.1?.getData()  ?? SerializableData()) }))
-	}
+    }
 }
 extension SerializableData:  ExpressibleByArrayLiteral {
     public typealias Element = SerializedDataStorable
-	public init(arrayLiteral elements: Element...) {
+    public init(arrayLiteral elements: Element...) {
         contents = .arrayType(elements.map { $0.getData() })
-	}
-	public init(arrayLiteral elements: Element?...) {
+    }
+    public init(arrayLiteral elements: Element?...) {
         contents = .arrayType(elements.map { $0?.getData() ?? SerializableData() })
-	}
+    }
 }
 
 
