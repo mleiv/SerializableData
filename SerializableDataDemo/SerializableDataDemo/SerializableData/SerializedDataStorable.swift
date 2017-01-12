@@ -62,7 +62,7 @@ extension URL: SerializedDataStorable, SerializedDataStorableFlatValue {
 }
 extension Data: SerializedDataStorable, SerializedDataStorableFlatValue {
     public func getData() -> SerializableData {
-        return SerializableData.safeInit(data: self) // special case
+        return SerializableData.init(data: self) // special case
     }
 }
 

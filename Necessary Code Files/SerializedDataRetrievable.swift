@@ -45,6 +45,6 @@ extension SerializedDataRetrievable where Self: SerializedDataStorable {
         get { return getData().jsonString }
     }
     public var serializedData: Data? {
-        get { return getData().nsData as Data? }
+        get { return getData().toData() as Data? }
     }
 }

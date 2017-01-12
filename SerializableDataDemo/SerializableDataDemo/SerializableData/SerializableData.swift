@@ -102,13 +102,9 @@ public struct SerializableData {
     }
     
     /// - Parameter data: does date to string conversion before storing value
-    public init(data: Data) throws {
+    public init(data: Data) {
         let sData = data.base64EncodedString()
         contents = .valueType(sData)
-    }
-    
-    public static func safeInit(data: Data) -> SerializableData {
-       return (try? SerializableData(data: data)) ?? SerializableData()
     }
     
     /// Note: You probably want to run this on a background thread for large data
@@ -164,10 +160,13 @@ extension SerializableData {
         switch contents {
         case .none: return nil
         case .valueType(let v):
-            if let tValue = v as? T {
-                return tValue
-            }
+//            if let tValue = v as? T {
+//                return tValue
+//            }
             let s = String(describing: v)
+            if s == "<null>" {
+                return nil
+            }
             // fun times: json is often ambiguous about whether it's a string or a number
             if Bool.self == T.self, let tValue = NSString(string: s).boolValue as? T {
                 return tValue
