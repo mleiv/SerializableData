@@ -62,15 +62,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     private var storeName: String = "SerializableDataDemo"
 
     lazy var persistentContainer: NSPersistentContainer = {
-    
-        
         // Run migrations
         // (We have to do a few extra steps because I was dumb and misnamed sqlite before)
         let fileManager = FileManager.default
         if let oldStoreUrl = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("SingleViewCoreData.sqlite"),
             let newStoreUrl = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first?.appendingPathComponent("\(self.storeName).sqlite") {
             do {
-                try self.migrateStoreToNewLocation(oldStoreUrl: oldStoreUrl, newStoreUrl: newStoreUrl)
+                do {
+                    try self.migrateStoreToNewLocation(oldStoreUrl: oldStoreUrl, newStoreUrl: newStoreUrl)
+                } catch {
+                    if !(error._domain == NSSQLiteErrorDomain && error._code == 14) { // old store deleted already
+                        throw error
+                    }
+                }
                 try Migrations(storeName: self.storeName, storeUrl: newStoreUrl).run(migrationNames: self.migrationNames)
             } catch {
                 print(error)
@@ -79,6 +83,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // Load up database stores
         let container = NSPersistentContainer(name: self.storeName)
+        if let newStoreUrl = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first?.appendingPathComponent("\(self.storeName).sqlite") {
+            let description = NSPersistentStoreDescription(url: newStoreUrl)
+            description.shouldMigrateStoreAutomatically = false
+            description.shouldInferMappingModelAutomatically = false
+            container.persistentStoreDescriptions = [description]
+        }
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
             if let error = error {
                 // Replace this implementation with code to handle the error appropriately.
@@ -99,18 +109,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }()
     
     private func migrateStoreToNewLocation(oldStoreUrl: URL, newStoreUrl: URL) throws {
+        // fileExists does not work here :( - always returns false
+        let fileManager = FileManager.default
         if let storeDirectory = Bundle.main.url(forResource: self.storeName, withExtension: "momd")?.lastPathComponent,
             let modelURL = Bundle.main.url(forResource: "SerializableDataDemo", withExtension: "mom", subdirectory: storeDirectory),
             let managedObjectModel = NSManagedObjectModel(contentsOf: modelURL) {
             let persistentStoreCoordinator = NSPersistentStoreCoordinator(managedObjectModel: managedObjectModel)
             // create new folder, if needed
             let newStorePath = newStoreUrl.deletingLastPathComponent()
-            try FileManager.default.createDirectory(at: newStorePath, withIntermediateDirectories: true, attributes: nil)
-            // Transfer data to new store
+            try fileManager.createDirectory(at: newStorePath, withIntermediateDirectories: true, attributes: nil)
             try persistentStoreCoordinator.replacePersistentStore(at: newStoreUrl, destinationOptions: nil, withPersistentStoreFrom: oldStoreUrl, sourceOptions: nil, ofType: NSSQLiteStoreType)
             // Remove old store
-            // comment out the following line if you are experimenting, because otherwise you have to start over from scratch.
-            try persistentStoreCoordinator.destroyPersistentStore(at: oldStoreUrl, ofType: NSSQLiteStoreType, options: nil)
+            // return here if you are experimenting, because otherwise you have to start over from scratch.
+//            try? persistentStoreCoordinator.destroyPersistentStore(at: oldStoreUrl, ofType: NSSQLiteStoreType, options: nil) // does not fully delete
+            try? fileManager.removeItem(at: oldStoreUrl)
+            try? fileManager.removeItem(at: oldStoreUrl.appendingPathComponent("-shm"))
+            try? fileManager.removeItem(at: oldStoreUrl.appendingPathComponent("-wal"))
         }
     }
 
