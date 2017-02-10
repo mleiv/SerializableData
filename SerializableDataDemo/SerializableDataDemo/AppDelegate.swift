@@ -14,11 +14,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         #if !TARGET_INTERFACE_BUILDER
-        CoreDataManager.context = managedObjectContext
+        CoreDataManager.persistentContainer = persistentContainer
         #endif
         
         return true
@@ -32,6 +31,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationDidEnterBackground(_ application: UIApplication) {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+        UserDefaults.standard.synchronize()
+        self.saveContext()
     }
 
     func applicationWillEnterForeground(_ application: UIApplication) {
@@ -45,71 +46,88 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
         // Saves changes in the application's managed object context before the application terminates.
+        UserDefaults.standard.synchronize()
         self.saveContext()
     }
 
     // MARK: - Core Data stack
+    
+    /// Warning: Keep in sync with currently selected migration. If they don't match, fatal error.
+    private var migrationNames = [
+        "SerializableDataDemo",
+        "SerializableDataDemo2",
+        "SerializableDataDemo3",
+    ]
+    
+    private var storeName: String = "SerializableDataDemo"
 
-    lazy var applicationDocumentsDirectory: URL = {
-        // The directory the application uses to store the Core Data store file. This code uses a directory named "com.urdnot.SerializableDataDemo" in the application's documents Application Support directory.
-        let urls = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-        return urls[urls.count-1]
-    }()
-
-    lazy var managedObjectModel: NSManagedObjectModel = {
-        // The managed object model for the application. This property is not optional. It is a fatal error for the application not to be able to find and load its model.
-        let modelURL = Bundle.main.url(forResource: "SerializableDataDemo", withExtension: "momd")!
-        return NSManagedObjectModel(contentsOf: modelURL)!
-    }()
-
-    lazy var persistentStoreCoordinator: NSPersistentStoreCoordinator = {
-        // The persistent store coordinator for the application. This implementation creates and returns a coordinator, having added the store for the application to it. This property is optional since there are legitimate error conditions that could cause the creation of the store to fail.
-        // Create the coordinator and store
-        let coordinator = NSPersistentStoreCoordinator(managedObjectModel: self.managedObjectModel)
-        let url = self.applicationDocumentsDirectory.appendingPathComponent("SingleViewCoreData.sqlite")
-        var failureReason = "There was an error creating or loading the application's saved data."
-        do {
-            try coordinator.addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: url, options: nil)
-        } catch {
-            // Report any error we got.
-            var dict = [String: AnyObject]()
-            dict[NSLocalizedDescriptionKey] = "Failed to initialize the application's saved data" as AnyObject?
-            dict[NSLocalizedFailureReasonErrorKey] = failureReason as AnyObject?
-
-            dict[NSUnderlyingErrorKey] = error as NSError
-            let wrappedError = NSError(domain: "YOUR_ERROR_DOMAIN", code: 9999, userInfo: dict)
-            // Replace this with code to handle the error appropriately.
-            // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-            NSLog("Unresolved error \(wrappedError), \(wrappedError.userInfo)")
-            abort()
+    lazy var persistentContainer: NSPersistentContainer = {
+    
+        
+        // Run migrations
+        // (We have to do a few extra steps because I was dumb and misnamed sqlite before)
+        let fileManager = FileManager.default
+        if let oldStoreUrl = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("SingleViewCoreData.sqlite"),
+            let newStoreUrl = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first?.appendingPathComponent("\(self.storeName).sqlite") {
+            do {
+                try self.migrateStoreToNewLocation(oldStoreUrl: oldStoreUrl, newStoreUrl: newStoreUrl)
+                try Migrations(storeName: self.storeName, storeUrl: newStoreUrl).run(migrationNames: self.migrationNames)
+            } catch {
+                print(error)
+            }
         }
         
-        return coordinator
+        // Load up database stores
+        let container = NSPersistentContainer(name: self.storeName)
+        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
+            if let error = error {
+                // Replace this implementation with code to handle the error appropriately.
+                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+                 
+                /*
+                 Typical reasons for an error here include:
+                 * The parent directory does not exist, cannot be created, or disallows writing.
+                 * The persistent store is not accessible, due to permissions or data protection when the device is locked.
+                 * The device is out of space.
+                 * The store could not be migrated to the current model version.
+                 Check the error message to determine what the actual problem was.
+                 */
+                fatalError("\(error)")
+            }
+        })
+        return container
     }()
-
-    lazy var managedObjectContext: NSManagedObjectContext = {
-        // Returns the managed object context for the application (which is already bound to the persistent store coordinator for the application.) This property is optional since there are legitimate error conditions that could cause the creation of the context to fail.
-        let coordinator = self.persistentStoreCoordinator
-        var managedObjectContext = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
-        managedObjectContext.persistentStoreCoordinator = coordinator
-        return managedObjectContext
-    }()
+    
+    private func migrateStoreToNewLocation(oldStoreUrl: URL, newStoreUrl: URL) throws {
+        if let storeDirectory = Bundle.main.url(forResource: self.storeName, withExtension: "momd")?.lastPathComponent,
+            let modelURL = Bundle.main.url(forResource: "SerializableDataDemo", withExtension: "mom", subdirectory: storeDirectory),
+            let managedObjectModel = NSManagedObjectModel(contentsOf: modelURL) {
+            let persistentStoreCoordinator = NSPersistentStoreCoordinator(managedObjectModel: managedObjectModel)
+            // create new folder, if needed
+            let newStorePath = newStoreUrl.deletingLastPathComponent()
+            try FileManager.default.createDirectory(at: newStorePath, withIntermediateDirectories: true, attributes: nil)
+            // Transfer data to new store
+            try persistentStoreCoordinator.replacePersistentStore(at: newStoreUrl, destinationOptions: nil, withPersistentStoreFrom: oldStoreUrl, sourceOptions: nil, ofType: NSSQLiteStoreType)
+            // Remove old store
+            // comment out the following line if you are experimenting, because otherwise you have to start over from scratch.
+            try persistentStoreCoordinator.destroyPersistentStore(at: oldStoreUrl, ofType: NSSQLiteStoreType, options: nil)
+        }
+    }
 
     // MARK: - Core Data Saving support
 
     func saveContext () {
-        if managedObjectContext.hasChanges {
+        let context = persistentContainer.viewContext
+        if context.hasChanges {
             do {
-                try managedObjectContext.save()
+                try context.save()
             } catch {
                 // Replace this implementation with code to handle the error appropriately.
-                // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
                 let nserror = error as NSError
-                NSLog("Unresolved error \(nserror), \(nserror.userInfo)")
-                abort()
+                fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
             }
         }
     }
-
 }
 

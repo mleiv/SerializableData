@@ -93,20 +93,20 @@ extension UserDefaultsPerson: UserDefaultsStorable {
     }
     
     public mutating func save() -> Bool {
-        let isSaved = UserDefaultsManager.save(self)
+        let isSaved = UserDefaultsManager.save(item: self)
         return isSaved
     }
     
     public mutating func delete() -> Bool {
-        let isDeleted = UserDefaultsManager.delete(self)
+        let isDeleted = UserDefaultsManager.delete(item: self)
         return isDeleted
     }
     
     
     // we do not delete data
     
-    public static func get(_ name: String) -> UserDefaultsPerson? {
-        return UserDefaultsManager.get(UserDefaultsPerson(name: name))
+    public static func get(name: String) -> UserDefaultsPerson? {
+        return UserDefaultsManager.get() { $0.name == name }
     }
     
     public static func getAll() -> [UserDefaultsPerson] {

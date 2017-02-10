@@ -84,36 +84,34 @@ public func ==(a: CoreDataPerson, b: CoreDataPerson) -> Bool { // not true equal
 
 import CoreData
 
-extension CoreDataPerson: CoreDataStorable {
+extension CoreDataPerson: CoreDataStorableExtra {
+    public typealias CoreDataEntityType = Persons
 
     public static var coreDataEntityName: String { return "Persons" }
     
-    public func setAdditionalColumns(_ coreItem: NSManagedObject) {
+    public func setAdditionalColumnsOnSave(
+        coreDataManager: CoreDataManager,
+        coreItem: NSManagedObject
+    ) {
         // only save searchable columns, everything else goes in serializedData
-        coreItem.setValue(name, forKey: "name")
+        guard let coreItem = coreItem as? CoreDataEntityType else { return }
+        coreItem.name = name
     }
     
-    public func setIdentifyingPredicate(_ fetchRequest: NSFetchRequest<NSFetchRequestResult>) {
+    public func setIdentifyingPredicate(
+        fetchRequest: NSFetchRequest<NSFetchRequestResult>
+    ) {
         fetchRequest.predicate = NSPredicate(format: "(name = %@)", name)
     }
     
-    public mutating func save() -> Bool {
-        let isSaved = CoreDataManager.save(self)
-        return isSaved
-    }
-    
-    public mutating func delete() -> Bool {
-        let isDeleted = CoreDataManager.delete(self)
-        return isDeleted
-    }
-    
-    public static func get(_ name: String) -> CoreDataPerson? {
-        return CoreDataManager.get(CoreDataPerson(name: name))
-    }
-    
-    public static func getAll() -> [CoreDataPerson] {
-        let all: [CoreDataPerson] = CoreDataManager.getAll()
-        return all
+    public static func get(
+        name: String,
+        coreDataManager: CoreDataManager? = nil
+    ) -> CoreDataPerson? {
+        let manager = coreDataManager ?? CoreDataManager()
+        return manager?.get() { fetchRequest in
+            fetchRequest.predicate = NSPredicate(format: "(name = %@)", name)
+        }
     }
     
 }

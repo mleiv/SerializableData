@@ -29,6 +29,9 @@
 		B04F6D551BD1CB9800790FB3 /* UserDefaultsPerson.swift in Sources */ = {isa = PBXBuildFile; fileRef = B04F6D491BD1CB9800790FB3 /* UserDefaultsPerson.swift */; };
 		B04F6D561BD1CB9800790FB3 /* UserDefaultsStorable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B04F6D4A1BD1CB9800790FB3 /* UserDefaultsStorable.swift */; };
 		B04F6D5C1BD1CC8100790FB3 /* SerializableDataDemo.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B04F6D5A1BD1CC8100790FB3 /* SerializableDataDemo.xcdatamodeld */; };
+		B1C67CB71E4C56BA0035B138 /* Migration3.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C67CB61E4C56BA0035B138 /* Migration3.swift */; };
+		B1C67CBC1E4C64F40035B138 /* Migrations.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C67CBB1E4C64F40035B138 /* Migrations.swift */; };
+		B1E427031E4D68B0002C28E5 /* Migration3.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = B1E427021E4D68B0002C28E5 /* Migration3.xcmappingmodel */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -68,6 +71,11 @@
 		B04F6D491BD1CB9800790FB3 /* UserDefaultsPerson.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserDefaultsPerson.swift; sourceTree = "<group>"; };
 		B04F6D4A1BD1CB9800790FB3 /* UserDefaultsStorable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserDefaultsStorable.swift; sourceTree = "<group>"; };
 		B04F6D5B1BD1CC8100790FB3 /* SerializableDataDemo.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SerializableDataDemo.xcdatamodel; sourceTree = "<group>"; };
+		B1C67CB61E4C56BA0035B138 /* Migration3.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Migration3.swift; sourceTree = "<group>"; };
+		B1C67CB81E4C56C60035B138 /* SerializableDataDemo2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SerializableDataDemo2.xcdatamodel; sourceTree = "<group>"; };
+		B1C67CBB1E4C64F40035B138 /* Migrations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Migrations.swift; sourceTree = "<group>"; };
+		B1E427011E4D6874002C28E5 /* SerializableDataDemo3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SerializableDataDemo3.xcdatamodel; sourceTree = "<group>"; };
+		B1E427021E4D68B0002C28E5 /* Migration3.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = Migration3.xcmappingmodel; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -109,11 +117,11 @@
 		B04F6D0B1BD1CAFA00790FB3 /* SerializableDataDemo */ = {
 			isa = PBXGroup;
 			children = (
+				B04F6D0C1BD1CAFA00790FB3 /* AppDelegate.swift */,
 				B04F6D431BD1CB9800790FB3 /* SerializableData */,
 				B04F6D401BD1CB9800790FB3 /* Extensions */,
 				B04F6D3A1BD1CB9800790FB3 /* Core Data */,
 				B04F6D471BD1CB9800790FB3 /* User Defaults */,
-				B04F6D0C1BD1CAFA00790FB3 /* AppDelegate.swift */,
 				B04F6D101BD1CAFA00790FB3 /* Main.storyboard */,
 				B04F6D2F1BD1CB7900790FB3 /* CoreDataPersonController.swift */,
 				B04F6D301BD1CB7900790FB3 /* CoreDataPersonsController.swift */,
@@ -151,6 +159,7 @@
 				B04F6D3B1BD1CB9800790FB3 /* CoreDataManager.swift */,
 				B04F6D3D1BD1CB9800790FB3 /* CoreDataStorable.swift */,
 				B04F6D3C1BD1CB9800790FB3 /* CoreDataPerson.swift */,
+				B1C67CB51E4C56BA0035B138 /* Migrations */,
 			);
 			path = "Core Data";
 			sourceTree = "<group>";
@@ -182,6 +191,16 @@
 				B04F6D491BD1CB9800790FB3 /* UserDefaultsPerson.swift */,
 			);
 			path = "User Defaults";
+			sourceTree = "<group>";
+		};
+		B1C67CB51E4C56BA0035B138 /* Migrations */ = {
+			isa = PBXGroup;
+			children = (
+				B1C67CBB1E4C64F40035B138 /* Migrations.swift */,
+				B1C67CB61E4C56BA0035B138 /* Migration3.swift */,
+				B1E427021E4D68B0002C28E5 /* Migration3.xcmappingmodel */,
+			);
+			path = Migrations;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -298,7 +317,10 @@
 				B04F6D521BD1CB9800790FB3 /* SerializedDataRetrievable.swift in Sources */,
 				B04F6D4C1BD1CB9800790FB3 /* CoreDataPerson.swift in Sources */,
 				B04F6D4D1BD1CB9800790FB3 /* CoreDataStorable.swift in Sources */,
+				B1C67CB71E4C56BA0035B138 /* Migration3.swift in Sources */,
 				B04F6D0D1BD1CAFA00790FB3 /* AppDelegate.swift in Sources */,
+				B1C67CBC1E4C64F40035B138 /* Migrations.swift in Sources */,
+				B1E427031E4D68B0002C28E5 /* Migration3.xcmappingmodel in Sources */,
 				B04F6D531BD1CB9800790FB3 /* SerializedDataStorable.swift in Sources */,
 				B04F6D351BD1CB7900790FB3 /* CoreDataPersonsController.swift in Sources */,
 				B04F6D4B1BD1CB9800790FB3 /* CoreDataManager.swift in Sources */,
@@ -384,7 +406,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -425,7 +447,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
@@ -520,9 +542,11 @@
 		B04F6D5A1BD1CC8100790FB3 /* SerializableDataDemo.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				B1E427011E4D6874002C28E5 /* SerializableDataDemo3.xcdatamodel */,
+				B1C67CB81E4C56C60035B138 /* SerializableDataDemo2.xcdatamodel */,
 				B04F6D5B1BD1CC8100790FB3 /* SerializableDataDemo.xcdatamodel */,
 			);
-			currentVersion = B04F6D5B1BD1CC8100790FB3 /* SerializableDataDemo.xcdatamodel */;
+			currentVersion = B1E427011E4D6874002C28E5 /* SerializableDataDemo3.xcdatamodel */;
 			path = SerializableDataDemo.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
