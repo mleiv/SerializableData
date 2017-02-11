@@ -68,13 +68,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if let oldStoreUrl = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("SingleViewCoreData.sqlite"),
             let newStoreUrl = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first?.appendingPathComponent("\(self.storeName).sqlite") {
             do {
-                do {
-                    try self.migrateStoreToNewLocation(oldStoreUrl: oldStoreUrl, newStoreUrl: newStoreUrl)
-                } catch {
-                    if !(error._domain == NSSQLiteErrorDomain && error._code == 14) { // old store deleted already
-                        throw error
-                    }
-                }
+                try self.migrateStoreToNewLocation(oldStoreUrl: oldStoreUrl, newStoreUrl: newStoreUrl)
                 try Migrations(storeName: self.storeName, storeUrl: newStoreUrl).run(migrationNames: self.migrationNames)
             } catch {
                 print(error)
@@ -111,6 +105,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     private func migrateStoreToNewLocation(oldStoreUrl: URL, newStoreUrl: URL) throws {
         // fileExists does not work here :( - always returns false
         let fileManager = FileManager.default
+        guard fileManager.fileExists(atPath: oldStoreUrl.path) && !fileManager.fileExists(atPath: newStoreUrl.path) else { return }
         if let storeDirectory = Bundle.main.url(forResource: self.storeName, withExtension: "momd")?.lastPathComponent,
             let modelURL = Bundle.main.url(forResource: "SerializableDataDemo", withExtension: "mom", subdirectory: storeDirectory),
             let managedObjectModel = NSManagedObjectModel(contentsOf: modelURL) {
