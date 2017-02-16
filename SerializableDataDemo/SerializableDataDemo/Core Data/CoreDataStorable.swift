@@ -1,10 +1,11 @@
 //
 //  CoreDataStorable.swift
-//  MEGameTracker
 //
-//  Created by Emily Ivie on 8/30/15.
-//  Copyright © 2017 Emily Ivie. All rights reserved.
-//
+//  Copyright 2017 Emily Ivie
+
+//  Licensed under The MIT License
+//  For full copyright and license information, please see http://opensource.org/licenses/MIT
+//  Redistributions of files must retain the above copyright notice.
 
 import Foundation
 import CoreData
@@ -18,23 +19,23 @@ public protocol CoreDataStorable: SerializedDataStorable, SerializedDataRetrieva
     
     /// Defined for you by the protocol.
     /// Returns the CoreData row that is equal to this object
-    func nsManagedObject(coreDataManager: CoreDataManager?) -> NSManagedObject?
+    func nsManagedObject(context: NSManagedObjectContext?) -> NSManagedObject?
     
     /// Define in the object itself. 
     /// Alters the predicate to retrieve only the row equal to this object
-    func setIdentifyingPredicate(fetchRequest: NSFetchRequest<NSFetchRequestResult>)
+    func setIdentifyingPredicate(fetchRequest: NSFetchRequest<NSManagedObject>)
     
     /// Define in the object itself. 
     /// Alters the object to store additional columns (serialized data stored by default).
     /// Useful to add searchable columns like name or id.
+    ///
+    /// Note: coreItem.managedObjectContext reports incorrect moc when using performBackgroundTask.
     func setAdditionalColumnsOnSave(
-        coreDataManager: CoreDataManager,
         coreItem: NSManagedObject
     )
     
     /// Defined for you by the protocol. Recommended to leave unchanged.
     func setColumnsOnSave(
-        coreDataManager: CoreDataManager,
         coreItem: NSManagedObject
     )
     
@@ -47,7 +48,7 @@ public protocol CoreDataStorable: SerializedDataStorable, SerializedDataRetrieva
     /// Defined for you by the protocol. Okay to customize.
     static func deleteAll(
         coreDataManager: CoreDataManager?,
-        alterFetchRequest: @escaping AlterFetchRequestClosure
+        alterFetchRequest: @escaping CoreDataManager.AlterFetchRequestClosure
     ) -> Bool
     
     /// Defined for you by the protocol. Recommended to leave unchanged.
@@ -55,20 +56,22 @@ public protocol CoreDataStorable: SerializedDataStorable, SerializedDataRetrieva
 }
 extension CoreDataStorable {
 
-    public func nsManagedObject(coreDataManager: CoreDataManager?) -> NSManagedObject? {
-        return coreDataManager?.fetchRow(item: self)
+    public func nsManagedObject(context: NSManagedObjectContext?) -> NSManagedObject? {
+        return CoreDataManager(context: context).fetchRow(item: self)
     }
     
-    public func setColumnsOnSave(coreDataManager: CoreDataManager, coreItem: NSManagedObject) {
-        coreItem.setValue(self.serializedData, forKey: CoreDataManager.SerializedDataKey)
-        setAdditionalColumnsOnSave(coreDataManager: coreDataManager, coreItem: coreItem)
+    public func setColumnsOnSave(
+        coreItem: NSManagedObject
+    ) {
+        coreItem.setValue(self.serializedData, forKey: CoreDataManager.current.serializedDataKey)
+        setAdditionalColumnsOnSave(coreItem: coreItem)
     }
     
     public mutating func save() -> Bool {
         return save(coreDataManager: nil)
     }
     public mutating func save(coreDataManager: CoreDataManager?) -> Bool {
-        let isSaved = (coreDataManager ?? CoreDataManager())?.save(item: self) ?? false
+        let isSaved = (coreDataManager ?? CoreDataManager.current)?.save(item: self) ?? false
         return isSaved
     }
     
@@ -76,25 +79,25 @@ extension CoreDataStorable {
         return delete(coreDataManager: nil)
     }
     public mutating func delete(coreDataManager: CoreDataManager?) -> Bool {
-        let isDeleted = (coreDataManager ?? CoreDataManager())?.delete(item: self) ?? false
+        let isDeleted = (coreDataManager ?? CoreDataManager.current)?.delete(item: self) ?? false
         return isDeleted
     }
     
     public static func deleteAll(
-        alterFetchRequest: @escaping AlterFetchRequestClosure
+        alterFetchRequest: @escaping CoreDataManager.AlterFetchRequestClosure
     ) -> Bool {
         return deleteAll(coreDataManager: nil, alterFetchRequest: alterFetchRequest)
     }
     public static func deleteAll(
         coreDataManager: CoreDataManager?,
-        alterFetchRequest: @escaping AlterFetchRequestClosure
+        alterFetchRequest: @escaping CoreDataManager.AlterFetchRequestClosure
     ) -> Bool {
-        let manager = coreDataManager ?? CoreDataManager()
-        return manager?.deleteAll(alterFetchRequest: alterFetchRequest, itemType: Self.self) ?? false
+        let manager = coreDataManager ?? CoreDataManager.current
+        return manager.deleteAll(alterFetchRequest: alterFetchRequest, itemType: Self.self) 
     }
     
     public func truncateTable() {
-        _ = CoreDataManager()?.truncateTable(itemType: Self.self)
+        _ = CoreDataManager.current.truncateTable(itemType: Self.self)
     }
 }
 
@@ -114,12 +117,12 @@ public protocol CoreDataStorableExtra: CoreDataStorable {
     /// Defined for you by the protocol. Okay to customize.
     static func get(
         coreDataManager: CoreDataManager?,
-        alterFetchRequest: @escaping AlterFetchRequestClosure
+        alterFetchRequest: @escaping CoreDataManager.AlterFetchRequestClosure
     ) -> Self?
     /// Defined for you by the protocol. Okay to customize.
     static func getAll(
         coreDataManager: CoreDataManager?,
-        alterFetchRequest: @escaping AlterFetchRequestClosure
+        alterFetchRequest: @escaping CoreDataManager.AlterFetchRequestClosure
     ) -> [Self]
 }
 
@@ -136,49 +139,49 @@ extension CoreDataStorableExtra {
         coreDataManager: CoreDataManager?
     ) -> Bool {
         guard !items.isEmpty else { return true }
-        let manager = coreDataManager ?? CoreDataManager()
-        let isSaved = manager?.saveAll(items: items) ?? false
+        let manager = coreDataManager ?? CoreDataManager.current
+        let isSaved = manager.saveAll(items: items) 
         return isSaved
     }
     
     public static func get(
-        alterFetchRequest: @escaping AlterFetchRequestClosure = { _ in }
+        alterFetchRequest: @escaping CoreDataManager.AlterFetchRequestClosure = { _ in }
     ) -> Self? {
         return get(coreDataManager: nil, alterFetchRequest: alterFetchRequest)
     }
     public static func get(
         coreDataManager: CoreDataManager?,
-        alterFetchRequest: @escaping AlterFetchRequestClosure
+        alterFetchRequest: @escaping CoreDataManager.AlterFetchRequestClosure
     ) -> Self? {
         return _get(coreDataManager: coreDataManager, alterFetchRequest: alterFetchRequest)
     }
     
     internal static func _get(
         coreDataManager: CoreDataManager? = nil,
-        alterFetchRequest: @escaping AlterFetchRequestClosure
+        alterFetchRequest: @escaping CoreDataManager.AlterFetchRequestClosure
     ) -> Self? {
-        let manager = coreDataManager ?? CoreDataManager()
-        let one: Self? = manager?.get(alterFetchRequest: alterFetchRequest)
+        let manager = coreDataManager ?? CoreDataManager.current
+        let one: Self? = manager.get(alterFetchRequest: alterFetchRequest)
         return one
     }
     
     public static func getAll(
-        alterFetchRequest: @escaping AlterFetchRequestClosure = { _ in }
+        alterFetchRequest: @escaping CoreDataManager.AlterFetchRequestClosure = { _ in }
     ) -> [Self] {
         return getAll(coreDataManager: nil, alterFetchRequest: alterFetchRequest)
     }
     public static func getAll(
         coreDataManager: CoreDataManager?,
-        alterFetchRequest: @escaping AlterFetchRequestClosure
+        alterFetchRequest: @escaping CoreDataManager.AlterFetchRequestClosure
     ) -> [Self] {
         return _getAll(coreDataManager: coreDataManager, alterFetchRequest: alterFetchRequest)
     }
     internal static func _getAll(
         coreDataManager: CoreDataManager? = nil,
-        alterFetchRequest: @escaping AlterFetchRequestClosure
+        alterFetchRequest: @escaping CoreDataManager.AlterFetchRequestClosure
     ) -> [Self] {
-        let manager = coreDataManager ?? CoreDataManager()
-        let all: [Self] = manager?.getAll(alterFetchRequest: alterFetchRequest) ?? []
+        let manager = coreDataManager ?? CoreDataManager.current
+        let all: [Self] = manager.getAll(alterFetchRequest: alterFetchRequest) 
         return all
     }
 }

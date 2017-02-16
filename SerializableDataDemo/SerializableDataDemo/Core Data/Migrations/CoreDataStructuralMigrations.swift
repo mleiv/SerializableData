@@ -1,19 +1,23 @@
 //
-//  Migrations.swift
-//  SerializableDataDemo
+//  CoreDataStructuralMigrations.swift
 //
-//  Created by Emily Ivie on 2/9/17.
+//  Copyright 2017 Emily Ivie
 
-//  Based on https://gist.github.com/kean/28439b29532993b620497621a4545789
-//  Copyright (c) 2016 Alexander Grebenyuk (github.com/kean).
-//  The MIT License (MIT)
-//
+//  Licensed under The MIT License
+//  For full copyright and license information, please see http://opensource.org/licenses/MIT
+//  Redistributions of files must retain the above copyright notice.
 
-import Foundation
 import CoreData
 
-struct Migrations {
+public struct CoreDataStructuralMigrations {
 
+    /// Warning: Keep in sync with currently selected migration. If they don't match, fatal error.
+    private var migrationNames = [
+        "SerializableDataDemo",
+        "SerializableDataDemo2",
+        "SerializableDataDemo3",
+    ]
+    
     enum MigrationError: String, Error {
         case missingOriginalStore = "Original store not found"
         case incompatibleModels = "Incompatible models"
@@ -28,7 +32,11 @@ struct Migrations {
         self.storeUrl = storeUrl
     }
     
-    func run(migrationNames: [String]) throws {
+    func run() throws {
+        guard FileManager.default.fileExists(atPath: storeUrl.path) else {
+            // we have no prior persistent data, so no migrations to run...
+            return
+        }
         let storeDirectory = Bundle.main.url(forResource: storeName, withExtension: "momd")?.lastPathComponent
         var migrationMoms = try migrationNames.flatMap {
             return try managedObjectModel(forName: $0, bundle: Bundle.main, directory: storeDirectory)

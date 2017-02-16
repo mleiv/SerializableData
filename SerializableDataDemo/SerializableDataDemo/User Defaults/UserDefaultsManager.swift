@@ -1,12 +1,11 @@
 //
 //  UserDefaultsManager.swift
 //
-//  Copyright 2015 Emily Ivie
+//  Copyright 2017 Emily Ivie
 
 //  Licensed under The MIT License
 //  For full copyright and license information, please see http://opensource.org/licenses/MIT
 //  Redistributions of files must retain the above copyright notice.
-//
 
 import Foundation
 

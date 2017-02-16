@@ -1,10 +1,11 @@
 //
 //  CoreDataPerson.swift
-//  MassEffectTracker
 //
-//  Created by Emily Ivie on 9/6/15.
-//  Copyright © 2015 urdnot. All rights reserved.
-//
+//  Copyright 2017 Emily Ivie
+
+//  Licensed under The MIT License
+//  For full copyright and license information, please see http://opensource.org/licenses/MIT
+//  Redistributions of files must retain the above copyright notice.
 
 import Foundation
 
@@ -90,7 +91,6 @@ extension CoreDataPerson: CoreDataStorableExtra {
     public static var coreDataEntityName: String { return "Persons" }
     
     public func setAdditionalColumnsOnSave(
-        coreDataManager: CoreDataManager,
         coreItem: NSManagedObject
     ) {
         // only save searchable columns, everything else goes in serializedData
@@ -99,7 +99,7 @@ extension CoreDataPerson: CoreDataStorableExtra {
     }
     
     public func setIdentifyingPredicate(
-        fetchRequest: NSFetchRequest<NSFetchRequestResult>
+        fetchRequest: NSFetchRequest<NSManagedObject>
     ) {
         fetchRequest.predicate = NSPredicate(format: "(name = %@)", name)
     }
@@ -109,7 +109,7 @@ extension CoreDataPerson: CoreDataStorableExtra {
         coreDataManager: CoreDataManager? = nil
     ) -> CoreDataPerson? {
         let manager = coreDataManager ?? CoreDataManager()
-        return manager?.get() { fetchRequest in
+        return manager.get() { fetchRequest in
             fetchRequest.predicate = NSPredicate(format: "(name = %@)", name)
         }
     }
