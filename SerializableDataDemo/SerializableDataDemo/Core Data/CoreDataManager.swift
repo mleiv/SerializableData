@@ -52,7 +52,7 @@ public struct CoreDataManager {
             fatalError("Could not create path to \(storeName) sqlite")
         }
         do {
-            try MoveStore20170211().run()
+            try MoveStore20170211().run() // special case because I made a dumb mistake
             try CoreDataStructuralMigrations(storeName: storeName, storeUrl: storeUrl).run()
         } catch {
             fatalError("Could not run migrations \(error)")
@@ -220,9 +220,10 @@ public struct CoreDataManager {
 
     /// Save a single row of a CoreDataStorable object.
     public func save<T: CoreDataStorable>(item: T) -> Bool {
-        var result: Bool = true//false
-        var moc = context
-        let waitForEndTask = DispatchWorkItem() {
+        var result: Bool = false
+        let waitForEndTask = DispatchWorkItem() {} // semaphore flag
+        persistentContainer.performBackgroundTask { moc in
+            defer { waitForEndTask.perform() }
             moc.automaticallyMergesChangesFromParent = true
             moc.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
             
@@ -237,49 +238,31 @@ public struct CoreDataManager {
                 print("Error: save failed for \(T.coreDataEntityName): \(saveError)")
             }
         }
-        persistentContainer.performBackgroundTask { overrideMoc in
-            moc = overrideMoc
-            waitForEndTask.perform()
-        }
         waitForEndTask.wait()
         return result
     }
 
     /// Save multiple rows.
     public func saveAll<T: CoreDataStorable>(items: [T]) -> Bool {
+        guard !items.isEmpty else { return true }
         var result: Bool = false
         let waitForEndTask = DispatchWorkItem() {} // semaphore flag
         persistentContainer.performBackgroundTask { moc in
-            defer { DispatchQueue.global(qos: .default).sync(execute: waitForEndTask) }
+            defer { waitForEndTask.perform() }
             moc.automaticallyMergesChangesFromParent = true
             moc.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
-            
-            var loopResult = true
-            for (index, item) in items.enumerated() {
-            
-                let coreItem = self.fetchRow(item: item) ?? NSEntityDescription.insertNewObject(forEntityName: T.coreDataEntityName, into: moc)
-                
-                item.setColumnsOnSave(coreItem: coreItem)
-                
-                if index > 0 && index % 200 == 0 {
-                    do {
-                        try moc.save()
-                        moc.reset()
-                        print("Batch saved  \(T.coreDataEntityName) at \(index)")
-                    } catch let saveError as NSError {
-                        loopResult = false
-                        print("Error: save failed for \(T.coreDataEntityName): \(saveError)")
-                        break
-                    }
+            autoreleasepool {
+                for item in items {
+                    let coreItem = CoreDataManager(context: moc).fetchRow(item: item) ?? NSEntityDescription.insertNewObject(forEntityName: T.coreDataEntityName, into: moc)
+                    
+                    item.setColumnsOnSave(coreItem: coreItem)
                 }
             }
-            if loopResult {
-                do {
-                    try moc.save()
-                    result = true
-                } catch let saveError as NSError {
-                    print("Error: save failed for \(T.coreDataEntityName): \(saveError)")
-                }
+            do {
+                try moc.save()
+                result = true
+            } catch let saveError as NSError {
+                print("Error: save failed for \(T.coreDataEntityName): \(saveError)")
             }
         }
         waitForEndTask.wait()
@@ -322,7 +305,7 @@ public struct CoreDataManager {
         var result: Bool = false
         let waitForEndTask = DispatchWorkItem() {} // semaphore flag
         persistentContainer.performBackgroundTask { moc in
-            defer { DispatchQueue.global(qos: .default).sync(execute: waitForEndTask) }
+            defer { waitForEndTask.perform() }
             moc.automaticallyMergesChangesFromParent = true
             moc.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
             
@@ -342,3 +325,4 @@ public struct CoreDataManager {
         return result
     }
 }
+
