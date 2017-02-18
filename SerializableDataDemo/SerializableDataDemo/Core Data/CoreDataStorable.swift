@@ -7,7 +7,6 @@
 //  For full copyright and license information, please see http://opensource.org/licenses/MIT
 //  Redistributions of files must retain the above copyright notice.
 
-import Foundation
 import CoreData
 
 /// A protocol for describing classes or structs that can be stored in core data using the CoreDataManager
@@ -48,7 +47,7 @@ public protocol CoreDataStorable: SerializedDataStorable, SerializedDataRetrieva
     /// Defined for you by the protocol. Okay to customize.
     static func deleteAll(
         coreDataManager: CoreDataManager?,
-        alterFetchRequest: @escaping CoreDataManager.AlterFetchRequestClosure
+        alterFetchRequest: @escaping AlterFetchRequestClosure
     ) -> Bool
     
     /// Defined for you by the protocol. Recommended to leave unchanged.
@@ -84,13 +83,13 @@ extension CoreDataStorable {
     }
     
     public static func deleteAll(
-        alterFetchRequest: @escaping CoreDataManager.AlterFetchRequestClosure
+        alterFetchRequest: @escaping AlterFetchRequestClosure
     ) -> Bool {
         return deleteAll(coreDataManager: nil, alterFetchRequest: alterFetchRequest)
     }
     public static func deleteAll(
         coreDataManager: CoreDataManager?,
-        alterFetchRequest: @escaping CoreDataManager.AlterFetchRequestClosure
+        alterFetchRequest: @escaping AlterFetchRequestClosure
     ) -> Bool {
         let manager = coreDataManager ?? CoreDataManager.current
         return manager.deleteAll(alterFetchRequest: alterFetchRequest, itemType: Self.self) 
@@ -117,12 +116,12 @@ public protocol CoreDataStorableExtra: CoreDataStorable {
     /// Defined for you by the protocol. Okay to customize.
     static func get(
         coreDataManager: CoreDataManager?,
-        alterFetchRequest: @escaping CoreDataManager.AlterFetchRequestClosure
+        alterFetchRequest: @escaping AlterFetchRequestClosure
     ) -> Self?
     /// Defined for you by the protocol. Okay to customize.
     static func getAll(
         coreDataManager: CoreDataManager?,
-        alterFetchRequest: @escaping CoreDataManager.AlterFetchRequestClosure
+        alterFetchRequest: @escaping AlterFetchRequestClosure
     ) -> [Self]
 }
 
@@ -145,20 +144,20 @@ extension CoreDataStorableExtra {
     }
     
     public static func get(
-        alterFetchRequest: @escaping CoreDataManager.AlterFetchRequestClosure = { _ in }
+        alterFetchRequest: @escaping AlterFetchRequestClosure = { _ in }
     ) -> Self? {
         return get(coreDataManager: nil, alterFetchRequest: alterFetchRequest)
     }
     public static func get(
         coreDataManager: CoreDataManager?,
-        alterFetchRequest: @escaping CoreDataManager.AlterFetchRequestClosure
+        alterFetchRequest: @escaping AlterFetchRequestClosure
     ) -> Self? {
         return _get(coreDataManager: coreDataManager, alterFetchRequest: alterFetchRequest)
     }
     
     internal static func _get(
         coreDataManager: CoreDataManager? = nil,
-        alterFetchRequest: @escaping CoreDataManager.AlterFetchRequestClosure
+        alterFetchRequest: @escaping AlterFetchRequestClosure
     ) -> Self? {
         let manager = coreDataManager ?? CoreDataManager.current
         let one: Self? = manager.get(alterFetchRequest: alterFetchRequest)
@@ -166,19 +165,19 @@ extension CoreDataStorableExtra {
     }
     
     public static func getAll(
-        alterFetchRequest: @escaping CoreDataManager.AlterFetchRequestClosure = { _ in }
+        alterFetchRequest: @escaping AlterFetchRequestClosure = { _ in }
     ) -> [Self] {
         return getAll(coreDataManager: nil, alterFetchRequest: alterFetchRequest)
     }
     public static func getAll(
         coreDataManager: CoreDataManager?,
-        alterFetchRequest: @escaping CoreDataManager.AlterFetchRequestClosure
+        alterFetchRequest: @escaping AlterFetchRequestClosure
     ) -> [Self] {
         return _getAll(coreDataManager: coreDataManager, alterFetchRequest: alterFetchRequest)
     }
     internal static func _getAll(
         coreDataManager: CoreDataManager? = nil,
-        alterFetchRequest: @escaping CoreDataManager.AlterFetchRequestClosure
+        alterFetchRequest: @escaping AlterFetchRequestClosure
     ) -> [Self] {
         let manager = coreDataManager ?? CoreDataManager.current
         let all: [Self] = manager.getAll(alterFetchRequest: alterFetchRequest) 

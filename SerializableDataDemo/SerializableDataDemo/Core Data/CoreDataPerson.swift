@@ -108,7 +108,7 @@ extension CoreDataPerson: CoreDataStorableExtra {
         name: String,
         coreDataManager: CoreDataManager? = nil
     ) -> CoreDataPerson? {
-        let manager = coreDataManager ?? CoreDataManager()
+        let manager = coreDataManager ?? CoreDataManager.current
         return manager.get() { fetchRequest in
             fetchRequest.predicate = NSPredicate(format: "(name = %@)", name)
         }

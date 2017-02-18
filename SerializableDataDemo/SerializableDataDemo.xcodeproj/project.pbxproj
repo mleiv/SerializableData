@@ -29,6 +29,7 @@
 		B04F6D551BD1CB9800790FB3 /* UserDefaultsPerson.swift in Sources */ = {isa = PBXBuildFile; fileRef = B04F6D491BD1CB9800790FB3 /* UserDefaultsPerson.swift */; };
 		B04F6D561BD1CB9800790FB3 /* UserDefaultsStorable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B04F6D4A1BD1CB9800790FB3 /* UserDefaultsStorable.swift */; };
 		B04F6D5C1BD1CC8100790FB3 /* SerializableDataDemo.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B04F6D5A1BD1CC8100790FB3 /* SerializableDataDemo.xcdatamodeld */; };
+		B11911181E5784A500BF7E06 /* CoreDataManageable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B11911171E5784A500BF7E06 /* CoreDataManageable.swift */; };
 		B12E98C51E56487000F0A577 /* CoreDataStructuralMigrations.swift in Sources */ = {isa = PBXBuildFile; fileRef = B12E98C41E56487000F0A577 /* CoreDataStructuralMigrations.swift */; };
 		B12E98C71E56494E00F0A577 /* MoveStore20170211.swift in Sources */ = {isa = PBXBuildFile; fileRef = B12E98C61E56494E00F0A577 /* MoveStore20170211.swift */; };
 		B1C67CB71E4C56BA0035B138 /* Migration3.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C67CB61E4C56BA0035B138 /* Migration3.swift */; };
@@ -72,6 +73,7 @@
 		B04F6D491BD1CB9800790FB3 /* UserDefaultsPerson.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserDefaultsPerson.swift; sourceTree = "<group>"; };
 		B04F6D4A1BD1CB9800790FB3 /* UserDefaultsStorable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserDefaultsStorable.swift; sourceTree = "<group>"; };
 		B04F6D5B1BD1CC8100790FB3 /* SerializableDataDemo.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SerializableDataDemo.xcdatamodel; sourceTree = "<group>"; };
+		B11911171E5784A500BF7E06 /* CoreDataManageable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataManageable.swift; sourceTree = "<group>"; };
 		B12E98C41E56487000F0A577 /* CoreDataStructuralMigrations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataStructuralMigrations.swift; sourceTree = "<group>"; };
 		B12E98C61E56494E00F0A577 /* MoveStore20170211.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MoveStore20170211.swift; sourceTree = "<group>"; };
 		B1C67CB61E4C56BA0035B138 /* Migration3.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Migration3.swift; sourceTree = "<group>"; };
@@ -158,6 +160,7 @@
 			isa = PBXGroup;
 			children = (
 				B04F6D5A1BD1CC8100790FB3 /* SerializableDataDemo.xcdatamodeld */,
+				B11911171E5784A500BF7E06 /* CoreDataManageable.swift */,
 				B04F6D3B1BD1CB9800790FB3 /* CoreDataManager.swift */,
 				B04F6D3D1BD1CB9800790FB3 /* CoreDataStorable.swift */,
 				B04F6D3C1BD1CB9800790FB3 /* CoreDataPerson.swift */,
@@ -317,6 +320,7 @@
 				B04F6D5C1BD1CC8100790FB3 /* SerializableDataDemo.xcdatamodeld in Sources */,
 				B04F6D381BD1CB7900790FB3 /* UserDefaultsPersonsController.swift in Sources */,
 				B04F6D4F1BD1CB9800790FB3 /* DictionaryExtension.swift in Sources */,
+				B11911181E5784A500BF7E06 /* CoreDataManageable.swift in Sources */,
 				B04F6D511BD1CB9800790FB3 /* SerializableData.swift in Sources */,
 				B04F6D521BD1CB9800790FB3 /* SerializedDataRetrievable.swift in Sources */,
 				B04F6D4C1BD1CB9800790FB3 /* CoreDataPerson.swift in Sources */,
