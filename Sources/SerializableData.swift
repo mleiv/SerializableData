@@ -1,12 +1,11 @@
 //
 //  SerializableData.swift
 //
-//  Copyright 2015 Emily Ivie
+//  Copyright 2017 Emily Ivie
 
 //  Licensed under The MIT License
 //  For full copyright and license information, please see http://opensource.org/licenses/MIT
 //  Redistributions of files must retain the above copyright notice.
-//
 
 import UIKit
 
@@ -443,7 +442,7 @@ extension SerializableData {
             default: urlStringValue += "\(self.urlEncode(prefixedKey))=&"
             }
         }
-        return urlStringValue.isEmpty ? "" : urlStringValue.stringFrom(0, to: -1)
+        return urlStringValue.isEmpty ? "" : urlStringValue.substring(to: urlStringValue.index(before: urlStringValue.endIndex))
     }
     
     /// - Parameter list: an array to convert
@@ -461,7 +460,7 @@ extension SerializableData {
             default: urlStringValue += prefixHere + ","
             }
         }
-        return urlStringValue.isEmpty ? "" : urlStringValue.stringFrom(0, to: -1)
+        return urlStringValue.isEmpty ? "" : urlStringValue.substring(to: urlStringValue.index(before: urlStringValue.endIndex))
     }
 
     /// - Parameter unescaped: The string to be escaped
@@ -512,10 +511,14 @@ extension SerializableData:  ExpressibleByDictionaryLiteral {
     public typealias Key = String
     public typealias Value = SerializedDataStorable
     public init(dictionaryLiteral tuples: (Key, Value)...) {
-        contents = .dictionaryType(Dictionary(tuples.map { ($0.0, $0.1.getData()) }))
+        var d: [String: SerializableData] = [:]
+        tuples.forEach { d[$0.0] = $0.1.getData() }
+        contents = .dictionaryType(d)
     }
     public init(dictionaryLiteral tuples: (Key, Value?)...) {
-        contents = .dictionaryType(Dictionary(tuples.map { ($0.0, $0.1?.getData()  ?? SerializableData()) }))
+        var d: [String: SerializableData] = [:]
+        tuples.forEach { d[$0.0] = $0.1?.getData() ?? SerializableData() }
+        contents = .dictionaryType(d)
     }
 }
 extension SerializableData:  ExpressibleByArrayLiteral {
@@ -582,13 +585,19 @@ extension SerializableData: CustomStringConvertible {
             for (key, value) in d {
                 description += "\(key)=\(value.description),"
             }
-            return !description.isEmpty ? "[\(description.stringFrom(0, to: -1))]" : "[]"
+            if !description.isEmpty {
+                return "[\(description.substring(to: description.index(before: description.endIndex)))]"
+            }
+            return "[]"
         case .arrayType(let a):
             var description = ""
             for (value) in a {
                 description += "\(value.description),"
             }
-            return !description.isEmpty ? "[\(description.stringFrom(0, to: -1))]" : "[]"
+            if !description.isEmpty {
+                return "[\(description.substring(to: description.index(before: description.endIndex)))]"
+            }
+            return "[]"
         default: return "nil"
         }
     }

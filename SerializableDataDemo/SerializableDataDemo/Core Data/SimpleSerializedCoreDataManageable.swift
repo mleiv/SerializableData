@@ -1,5 +1,5 @@
 //
-//  CoreDataManageable.swift
+//  SimpleSerializedCoreDataManageable.swift
 //
 //  Copyright 2017 Emily Ivie
 

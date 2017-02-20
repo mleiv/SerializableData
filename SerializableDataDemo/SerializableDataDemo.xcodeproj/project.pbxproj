@@ -19,8 +19,6 @@
 		B04F6D381BD1CB7900790FB3 /* UserDefaultsPersonsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B04F6D331BD1CB7900790FB3 /* UserDefaultsPersonsController.swift */; };
 		B04F6D4C1BD1CB9800790FB3 /* CoreDataPerson.swift in Sources */ = {isa = PBXBuildFile; fileRef = B04F6D3C1BD1CB9800790FB3 /* CoreDataPerson.swift */; };
 		B04F6D4D1BD1CB9800790FB3 /* SimpleSerializedCoreDataStorable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B04F6D3D1BD1CB9800790FB3 /* SimpleSerializedCoreDataStorable.swift */; };
-		B04F6D4F1BD1CB9800790FB3 /* DictionaryExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B04F6D411BD1CB9800790FB3 /* DictionaryExtension.swift */; };
-		B04F6D501BD1CB9800790FB3 /* StringExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B04F6D421BD1CB9800790FB3 /* StringExtension.swift */; };
 		B04F6D511BD1CB9800790FB3 /* SerializableData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B04F6D441BD1CB9800790FB3 /* SerializableData.swift */; };
 		B04F6D521BD1CB9800790FB3 /* SerializedDataRetrievable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B04F6D451BD1CB9800790FB3 /* SerializedDataRetrievable.swift */; };
 		B04F6D531BD1CB9800790FB3 /* SerializedDataStorable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B04F6D461BD1CB9800790FB3 /* SerializedDataStorable.swift */; };
@@ -64,8 +62,6 @@
 		B04F6D331BD1CB7900790FB3 /* UserDefaultsPersonsController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserDefaultsPersonsController.swift; sourceTree = "<group>"; };
 		B04F6D3C1BD1CB9800790FB3 /* CoreDataPerson.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataPerson.swift; sourceTree = "<group>"; };
 		B04F6D3D1BD1CB9800790FB3 /* SimpleSerializedCoreDataStorable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SimpleSerializedCoreDataStorable.swift; sourceTree = "<group>"; };
-		B04F6D411BD1CB9800790FB3 /* DictionaryExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DictionaryExtension.swift; sourceTree = "<group>"; };
-		B04F6D421BD1CB9800790FB3 /* StringExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringExtension.swift; sourceTree = "<group>"; };
 		B04F6D441BD1CB9800790FB3 /* SerializableData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SerializableData.swift; sourceTree = "<group>"; };
 		B04F6D451BD1CB9800790FB3 /* SerializedDataRetrievable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SerializedDataRetrievable.swift; sourceTree = "<group>"; };
 		B04F6D461BD1CB9800790FB3 /* SerializedDataStorable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SerializedDataStorable.swift; sourceTree = "<group>"; };
@@ -175,8 +171,6 @@
 		B04F6D401BD1CB9800790FB3 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				B04F6D411BD1CB9800790FB3 /* DictionaryExtension.swift */,
-				B04F6D421BD1CB9800790FB3 /* StringExtension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -322,7 +316,6 @@
 				B12E98C71E56494E00F0A577 /* MoveStore20170211.swift in Sources */,
 				B04F6D5C1BD1CC8100790FB3 /* SerializableDataDemo.xcdatamodeld in Sources */,
 				B04F6D381BD1CB7900790FB3 /* UserDefaultsPersonsController.swift in Sources */,
-				B04F6D4F1BD1CB9800790FB3 /* DictionaryExtension.swift in Sources */,
 				B1CC5D081E5AACB4007E0589 /* SimpleCoreDataManager.swift in Sources */,
 				B11911181E5784A500BF7E06 /* SimpleSerializedCoreDataManageable.swift in Sources */,
 				B04F6D511BD1CB9800790FB3 /* SerializableData.swift in Sources */,
@@ -336,7 +329,6 @@
 				B1E427031E4D68B0002C28E5 /* Migration3.xcmappingmodel in Sources */,
 				B04F6D531BD1CB9800790FB3 /* SerializedDataStorable.swift in Sources */,
 				B04F6D351BD1CB7900790FB3 /* CoreDataPersonsController.swift in Sources */,
-				B04F6D501BD1CB9800790FB3 /* StringExtension.swift in Sources */,
 				B04F6D341BD1CB7900790FB3 /* CoreDataPersonController.swift in Sources */,
 				B04F6D551BD1CB9800790FB3 /* UserDefaultsPerson.swift in Sources */,
 			);
