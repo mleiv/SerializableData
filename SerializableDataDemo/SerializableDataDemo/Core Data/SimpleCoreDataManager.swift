@@ -1,5 +1,5 @@
 //
-//  CoreDataManager.swift
+//  SimpleCoreDataManager.swift
 //
 //  Copyright 2017 Emily Ivie
 
@@ -9,28 +9,32 @@
 
 import CoreData
 
-/// Manages the storage and retrieval of CoreDataStorable/SerializableData objects.
-public struct CoreDataManager: CoreDataManageable {
+struct SimpleCoreDataManager: SimpleSerializedCoreDataManageable {
 
     public static let defaultStoreName = "SerializableDataDemo"
-    public static var current: CoreDataManager = CoreDataManager(storeName: defaultStoreName)
+    public var serializedDataKey: String { return "serializedData" }
     
-    public static var isConfineToMemoryStore: Bool = false // set to true for testing
+    public static var current: SimpleCoreDataManageable { return currentSerializable }
+    public static var currentSerializable: SimpleSerializedCoreDataManageable = SimpleCoreDataManager(storeName: defaultStoreName)
+
     public static var isManageMigrations: Bool = true // we manage migrations
     
     public let storeName: String
-    public let serializedDataKey = "serializedData"
     public let persistentContainer: NSPersistentContainer
     public let specificContext: NSManagedObjectContext?
     
-    public init(storeName: String?, context: NSManagedObjectContext?) {
-        self.storeName = storeName ?? CoreDataManager.defaultStoreName
+    public init() {
+        self.init(storeName: SimpleCoreDataManager.defaultStoreName)
+    }
+    
+    public init(storeName: String?, context: NSManagedObjectContext?, isConfineToMemoryStore: Bool) {
+        self.storeName = storeName ?? SimpleCoreDataManager.defaultStoreName
         self.specificContext = context
         if let storeName = storeName {
             self.persistentContainer = NSPersistentContainer(name: storeName)
-            initContainer()
+            initContainer(isConfineToMemoryStore: isConfineToMemoryStore)
         } else {
-            persistentContainer = CoreDataManager.current.persistentContainer
+            persistentContainer = SimpleCoreDataManager.current.persistentContainer
         }
     }
     
@@ -43,4 +47,3 @@ public struct CoreDataManager: CoreDataManageable {
         }
     }
 }
-

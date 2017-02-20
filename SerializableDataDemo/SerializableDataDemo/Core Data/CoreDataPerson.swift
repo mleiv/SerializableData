@@ -10,6 +10,8 @@
 import Foundation
 
 public struct CoreDataPerson {
+
+    // MARK: Basic properties
     
     public fileprivate(set) var createdDate = Date()
     public var modifiedDate = Date()
@@ -31,7 +33,8 @@ public struct CoreDataPerson {
 //MARK: Saving/Retrieving Data
 
 extension CoreDataPerson: SerializedDataStorable {
-
+    
+    /// Anything we want to save to core data should be put here.
     public func getData() -> SerializableData {
         var list = [String: SerializedDataStorable?]()
         list["name"] = name
@@ -48,6 +51,7 @@ extension CoreDataPerson: SerializedDataStorable {
 
 extension CoreDataPerson: SerializedDataRetrievable {
     
+    /// Recreation of person from SerializableData object.
     public init?(data: SerializableData?) {
         guard let data = data, let name = data["name"]?.string
         else {
@@ -59,6 +63,7 @@ extension CoreDataPerson: SerializedDataRetrievable {
         setData(data)
     }
     
+    /// Anything we want to retrieve from core data should be put here.
     public mutating func setData(_ data: SerializableData) {
         //mandatory data (probably already set, but allow it to be set again if setData() was called separately)
         name = data["name"]?.string ?? name
@@ -73,45 +78,51 @@ extension CoreDataPerson: SerializedDataRetrievable {
     
 }
 
-//MARK: Equatable
-
-extension CoreDataPerson: Equatable {}
-
-public func ==(a: CoreDataPerson, b: CoreDataPerson) -> Bool { // not true equality, just same db row
-    return a.name == b.name
-}
-
 //MARK: CoreData
 
 import CoreData
 
-extension CoreDataPerson: CoreDataStorableExtra {
-    public typealias CoreDataEntityType = Persons
+extension CoreDataPerson: SimpleSerializedCoreDataStorable {
 
-    public static var coreDataEntityName: String { return "Persons" }
+    /// Core data entity type for persons.
+    public typealias EntityType = Persons
     
+    /// Reference to current core data manager.
+    public static var defaultManager: SimpleSerializedCoreDataManageable { return SimpleCoreDataManager.currentSerializable }
+    
+    /// Copy this person's values to core data row.
     public func setAdditionalColumnsOnSave(
-        coreItem: NSManagedObject
+        coreItem: EntityType
     ) {
         // only save searchable columns, everything else goes in serializedData
-        guard let coreItem = coreItem as? CoreDataEntityType else { return }
         coreItem.name = name
     }
     
+    /// Identify this person's core data row.
     public func setIdentifyingPredicate(
-        fetchRequest: NSFetchRequest<NSManagedObject>
+        fetchRequest: NSFetchRequest<EntityType>
     ) {
         fetchRequest.predicate = NSPredicate(format: "(name = %@)", name)
     }
     
+    /// Convenience: get person by name.
     public static func get(
         name: String,
-        coreDataManager: CoreDataManager? = nil
+        from manager: SimpleSerializedCoreDataManageable? = nil
     ) -> CoreDataPerson? {
-        let manager = coreDataManager ?? CoreDataManager.current
-        return manager.get() { fetchRequest in
-            fetchRequest.predicate = NSPredicate(format: "(name = %@)", name)
+        let manager = manager ?? defaultManager
+        let person: CoreDataPerson? = manager.getValue() { fetchRequest in
+            fetchRequest.predicate = NSPredicate(format: "(%K = %@)", #keyPath(Persons.name), name)
         }
+        return person
     }
-    
+}
+
+//MARK: Equatable
+
+extension CoreDataPerson: Equatable {}
+
+/// See setIdentifyingPredicate() above - this checks identifying properties for same-row equivalence.
+public func ==(a: CoreDataPerson, b: CoreDataPerson) -> Bool {
+    return a.name == b.name
 }
