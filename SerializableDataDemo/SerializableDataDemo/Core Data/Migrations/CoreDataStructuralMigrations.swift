@@ -1,11 +1,11 @@
 //
 //  CoreDataStructuralMigrations.swift
 //
-//  Copyright 2017 Emily Ivie
+//  Created by Emily Ivie on 2/9/17.
 
-//  Licensed under The MIT License
-//  For full copyright and license information, please see http://opensource.org/licenses/MIT
-//  Redistributions of files must retain the above copyright notice.
+//  Based on https://gist.github.com/kean/28439b29532993b620497621a4545789
+//  Copyright (c) 2016 Alexander Grebenyuk (github.com/kean).
+//  The MIT License (MIT)
 
 import CoreData
 
