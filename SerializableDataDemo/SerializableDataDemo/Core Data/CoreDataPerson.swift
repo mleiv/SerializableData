@@ -16,6 +16,7 @@ public struct CoreDataPerson {
     public fileprivate(set) var createdDate = Date()
     public var modifiedDate = Date()
     
+    public var id: UUID
     public var name: String
     
     public var profession: String?
@@ -25,7 +26,8 @@ public struct CoreDataPerson {
     
     // MARK: Basic initializer
     
-    public init(name: String) {
+    public init(id: UUID? = nil, name: String) {
+        self.id = id ?? UUID()
         self.name = name
     }
 }
@@ -37,6 +39,7 @@ extension CoreDataPerson: SerializedDataStorable {
     /// Anything we want to save to core data should be put here.
     public func getData() -> SerializableData {
         var list = [String: SerializedDataStorable?]()
+        list["id"] = id.uuidString
         list["name"] = name
         list["profession"] = profession
         list["organization"] = organization
@@ -53,12 +56,18 @@ extension CoreDataPerson: SerializedDataRetrievable {
     
     /// Recreation of person from SerializableData object.
     public init?(data: SerializableData?) {
-        guard let data = data, let name = data["name"]?.string
+        self.init(data: data, isAllowNoId: true)
+    }
+    public init?(data: SerializableData?, isAllowNoId: Bool) {
+        let defaultUuid: UUID? = isAllowNoId ? UUID() : nil
+        guard let data = data,
+            let id = UUID(uuidString: data["id"]?.string ?? "") ?? defaultUuid,
+            let name = data["name"]?.string
         else {
             return nil
         }
         // required values:
-        self.name = name
+        self.init(id: id, name: name)
         // optional values:
         setData(data)
     }
@@ -66,6 +75,7 @@ extension CoreDataPerson: SerializedDataRetrievable {
     /// Anything we want to retrieve from core data should be put here.
     public mutating func setData(_ data: SerializableData) {
         //mandatory data (probably already set, but allow it to be set again if setData() was called separately)
+        id = UUID(uuidString: data["id"]?.string ?? "") ?? id
         name = data["name"]?.string ?? name
         
         //optional values:
@@ -88,13 +98,14 @@ extension CoreDataPerson: SimpleSerializedCoreDataStorable {
     public typealias EntityType = Persons
     
     /// Reference to current core data manager.
-    public static var defaultManager: SimpleSerializedCoreDataManageable { return SimpleCoreDataManager.currentSerializable }
+    public static var defaultManager: SimpleSerializedCoreDataManageable { return SimpleCoreDataManager.serializableCurrent }
     
     /// Copy this person's values to core data row.
     public func setAdditionalColumnsOnSave(
         coreItem: EntityType
     ) {
         // only save searchable columns, everything else goes in serializedData
+        coreItem.id = id.uuidString
         coreItem.name = name
     }
     
@@ -102,13 +113,25 @@ extension CoreDataPerson: SimpleSerializedCoreDataStorable {
     public func setIdentifyingPredicate(
         fetchRequest: NSFetchRequest<EntityType>
     ) {
-        fetchRequest.predicate = NSPredicate(format: "(name = %@)", name)
+        fetchRequest.predicate = NSPredicate(format: "(id = %@)", id.uuidString)
+    }
+    
+    /// Convenience: get person by id.
+    public static func get(
+        id: String,
+        with manager: SimpleSerializedCoreDataManageable? = nil
+    ) -> CoreDataPerson? {
+        let manager = manager ?? defaultManager
+        let person: CoreDataPerson? = manager.getValue() { fetchRequest in
+            fetchRequest.predicate = NSPredicate(format: "(%K = %@)", #keyPath(Persons.id), id)
+        }
+        return person
     }
     
     /// Convenience: get person by name.
     public static func get(
         name: String,
-        from manager: SimpleSerializedCoreDataManageable? = nil
+        with manager: SimpleSerializedCoreDataManageable? = nil
     ) -> CoreDataPerson? {
         let manager = manager ?? defaultManager
         let person: CoreDataPerson? = manager.getValue() { fetchRequest in
@@ -118,11 +141,19 @@ extension CoreDataPerson: SimpleSerializedCoreDataStorable {
     }
 }
 
+
+// MARK: Sorting
+extension CoreDataPerson {
+    static func sort(_ a: CoreDataPerson, b: CoreDataPerson) -> Bool {
+        return (a.name).localizedCaseInsensitiveCompare(b.name) == .orderedAscending // handle accented characters
+    }
+}
+
 //MARK: Equatable
 
 extension CoreDataPerson: Equatable {}
 
 /// See setIdentifyingPredicate() above - this checks identifying properties for same-row equivalence.
 public func ==(a: CoreDataPerson, b: CoreDataPerson) -> Bool {
-    return a.name == b.name
+    return a.id == b.id
 }

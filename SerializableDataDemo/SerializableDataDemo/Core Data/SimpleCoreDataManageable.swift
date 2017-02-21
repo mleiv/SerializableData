@@ -10,9 +10,6 @@
 
 import CoreData
 
-public typealias AlterFetchRequestClosure<T: NSManagedObject> = ((NSFetchRequest<T>)->Void)
-public typealias SetAdditionalColumnsClosure<T> = ((T)->Void)
-
 /// Manages the storage and retrieval of CoreDataStorable/SerializableData objects.
 public protocol SimpleCoreDataManageable {
 
@@ -41,35 +38,35 @@ public protocol SimpleCoreDataManageable {
     
     /// Retrieve single row with criteria closure.
     func getOne<T: NSManagedObject>(
-        alterFetchRequest: @escaping AlterFetchRequestClosure<T>
+        alterFetchRequest: @escaping AlterFetchRequest<T>
     ) -> T?
     
     /// Retrieve multiple rows with criteria closure.
     func getAll<T: NSManagedObject>(
-        alterFetchRequest: @escaping AlterFetchRequestClosure<T>
+        alterFetchRequest: @escaping AlterFetchRequest<T>
     ) -> [T]
     
     /// Retrieve a count of matching entities
     func getCount<T: NSManagedObject>(
-        alterFetchRequest: @escaping AlterFetchRequestClosure<T>
+        alterFetchRequest: @escaping AlterFetchRequest<T>
     ) -> Int
     
     /// Retrieve faulted data for optimization.
     func getAllFetchedResults<T: NSManagedObject>(
-        alterFetchRequest: AlterFetchRequestClosure<T>,
+        alterFetchRequest: AlterFetchRequest<T>,
         sectionKey: String?,
         cacheName: String?
     ) -> NSFetchedResultsController<T>?
     
     /// Creates a new row of CoreData and returns a SimpleCoreDataStorable object.
     func createOne<T: NSManagedObject>(
-        setInitialValues: @escaping SetAdditionalColumnsClosure<T>
+        setInitialValues: @escaping SetAdditionalColumns<T>
     ) -> T?
 
     /// Save a single row of an entity.
     func saveChanges<T: NSManagedObject>(
         item: T,
-        setChangedValues: @escaping SetAdditionalColumnsClosure<T>
+        setChangedValues: @escaping SetAdditionalColumns<T>
     ) -> Bool
     
     /// Delete single row of a entity.
@@ -79,7 +76,7 @@ public protocol SimpleCoreDataManageable {
     
     /// Remove all rows of an entity matching restrictions.
     func deleteAll<T: NSManagedObject>(
-        alterFetchRequest: @escaping AlterFetchRequestClosure<T>
+        alterFetchRequest: @escaping AlterFetchRequest<T>
     ) -> Bool
     
 }
@@ -119,7 +116,9 @@ extension SimpleCoreDataManageable {
         }
         
         // make any pending changes
-        runMigrations(storeUrl: storeUrl)
+        if !isConfineToMemoryStore {
+            runMigrations(storeUrl: storeUrl)
+        }
         
         // Set some rules for this container
         let description = NSPersistentStoreDescription(url: storeUrl)
@@ -158,6 +157,8 @@ extension SimpleCoreDataManageable {
 
 // MARK: Core data content functions
 extension SimpleCoreDataManageable {
+    public typealias AlterFetchRequest<T: NSManagedObject> = ((NSFetchRequest<T>)->Void)
+    public typealias SetAdditionalColumns<T: NSManagedObject> = ((T)->Void)
     
     /// Save the primary context to file. Call this before exiting app.
     public func save() {
@@ -177,20 +178,23 @@ extension SimpleCoreDataManageable {
     
     /// Retrieve single row with criteria closure.
     public func getOne<T: NSManagedObject>(
-        alterFetchRequest: @escaping AlterFetchRequestClosure<T>
-    ) -> T?  {
-        let moc = context
+        alterFetchRequest: @escaping AlterFetchRequest<T>
+    ) -> T? {
         var result: T?
-        moc.performAndWait { // performAndWait does not require autoreleasepool
+        let moc = context
+        print(context)
+        moc.performAndWait {
             guard let fetchRequest = T.fetchRequest() as? NSFetchRequest<T> else { return }
             alterFetchRequest(fetchRequest)
             fetchRequest.fetchLimit = 1
-            do {
-                if let item = try fetchRequest.execute().first {
-                    result = item
+            autoreleasepool {
+                do {
+                    if let item = try fetchRequest.execute().first {
+                        result = item
+                    }
+                } catch let fetchError as NSError {
+                    print("Error: get failed for \(T.self): \(fetchError)")
                 }
-            } catch let fetchError as NSError {
-                print("Error: get failed for \(T.self): \(fetchError)")
             }
         }
         return result
@@ -198,7 +202,7 @@ extension SimpleCoreDataManageable {
     
     /// Retrieve multiple rows with criteria closure.
     public func getAll<T: NSManagedObject>(
-        alterFetchRequest: @escaping AlterFetchRequestClosure<T>
+        alterFetchRequest: @escaping AlterFetchRequest<T>
     ) -> [T] {
         let moc = context
         var result: [T] = []
@@ -216,7 +220,7 @@ extension SimpleCoreDataManageable {
     
     /// Retrieve a count of matching entities
     public func getCount<T: NSManagedObject>(
-        alterFetchRequest: @escaping AlterFetchRequestClosure<T>
+        alterFetchRequest: @escaping AlterFetchRequest<T>
     ) -> Int {
         let moc = context
         var result = 0
@@ -234,7 +238,7 @@ extension SimpleCoreDataManageable {
     
     /// Retrieve faulted data for optimization.
     public func getAllFetchedResults<T: NSManagedObject>(
-        alterFetchRequest: AlterFetchRequestClosure<T>,
+        alterFetchRequest: AlterFetchRequest<T>,
         sectionKey: String?,
         cacheName: String?
     ) -> NSFetchedResultsController<T>? {
@@ -256,7 +260,7 @@ extension SimpleCoreDataManageable {
     
     /// Creates a new row of CoreData and returns a SimpleCoreDataStorable object.
     public func createOne<T: NSManagedObject>(
-        setInitialValues: @escaping SetAdditionalColumnsClosure<T>
+        setInitialValues: @escaping SetAdditionalColumns<T>
     ) -> T? {
         let moc = context
         var result: T?
@@ -289,7 +293,7 @@ extension SimpleCoreDataManageable {
     /// Save a single row of an entity.
     public func saveChanges<T: NSManagedObject>(
         item: T,
-        setChangedValues: @escaping SetAdditionalColumnsClosure<T>
+        setChangedValues: @escaping SetAdditionalColumns<T>
     ) -> Bool {
         var result: Bool = false
         let waitForEndTask = DispatchWorkItem() {} // semaphore flag
@@ -334,7 +338,7 @@ extension SimpleCoreDataManageable {
     
     /// Remove all rows of an entity matching restrictions.
     public func deleteAll<T: NSManagedObject>(
-        alterFetchRequest: @escaping AlterFetchRequestClosure<T>
+        alterFetchRequest: @escaping AlterFetchRequest<T>
     ) -> Bool {
         guard persistentContainer.persistentStoreDescriptions.first?.type != NSInMemoryStoreType else {
             return tediousManualDelete(alterFetchRequest: alterFetchRequest)
@@ -363,7 +367,7 @@ extension SimpleCoreDataManageable {
     }
     
     private func tediousManualDelete<T: NSManagedObject>(
-        alterFetchRequest: @escaping AlterFetchRequestClosure<T>
+        alterFetchRequest: @escaping AlterFetchRequest<T>
     ) -> Bool {
         var result: Bool = false
         let waitForEndTask = DispatchWorkItem() {} // semaphore flag

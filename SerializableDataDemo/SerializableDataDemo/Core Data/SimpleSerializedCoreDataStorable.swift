@@ -44,13 +44,19 @@ public protocol SimpleSerializedCoreDataStorable: SerializedDataStorable, Serial
     /// Gets the struct to match the core data request.
     static func get(
         with manager: SimpleSerializedCoreDataManageable?,
-        alterFetchRequest: @escaping AlterFetchRequestClosure<EntityType>
+        alterFetchRequest: @escaping AlterFetchRequest<EntityType>
     ) -> Self?
+    
+    /// Gets the struct to match the core data request.
+    static func getCount(
+        with manager: SimpleSerializedCoreDataManageable?,
+        alterFetchRequest: @escaping AlterFetchRequest<EntityType>
+    ) -> Int
     
     /// Gets all structs that match the core data request.
     static func getAll(
         with manager: SimpleSerializedCoreDataManageable?,
-        alterFetchRequest: @escaping AlterFetchRequestClosure<EntityType>
+        alterFetchRequest: @escaping AlterFetchRequest<EntityType>
     ) -> [Self]
     
     /// Saves the struct to core data.
@@ -72,11 +78,12 @@ public protocol SimpleSerializedCoreDataStorable: SerializedDataStorable, Serial
     /// Deletes all rows that match the core data request.
     static func deleteAll(
         with manager: SimpleSerializedCoreDataManageable?,
-        alterFetchRequest: @escaping AlterFetchRequestClosure<EntityType>
+        alterFetchRequest: @escaping AlterFetchRequest<EntityType>
     ) -> Bool
 }
 
 extension SimpleSerializedCoreDataStorable {
+    public typealias AlterFetchRequest<T: NSManagedObject> = ((NSFetchRequest<T>)->Void)
     
     /// Convenience - get the static version for easy instance reference.
     public var defaultManager: SimpleSerializedCoreDataManageable {
@@ -104,16 +111,23 @@ extension SimpleSerializedCoreDataStorable {
     /// Gets the struct to match the core data request.
     public static func get(
         with manager: SimpleSerializedCoreDataManageable?,
-        alterFetchRequest: @escaping AlterFetchRequestClosure<EntityType>
+        alterFetchRequest: @escaping AlterFetchRequest<EntityType>
     ) -> Self? {
         return _get(with: manager, alterFetchRequest: alterFetchRequest)
     }
     
     /// Convenience version of get:manager:alterFetchRequest (manager not required).
     public static func get(
-        alterFetchRequest: @escaping AlterFetchRequestClosure<EntityType>
+        alterFetchRequest: @escaping AlterFetchRequest<EntityType>
     ) -> Self? {
         return get(with: nil, alterFetchRequest: alterFetchRequest)
+    }
+    
+    /// Convenience version of get:manager:alterFetchRequest (alterFetchRequest not required).
+    public static func get(
+        with manager: SimpleSerializedCoreDataManageable?
+    ) -> Self? {
+        return get(with: manager) { _ in }
     }
     
     /// Convenience version of get:manager:alterFetchRequest (no parameters required).
@@ -126,27 +140,63 @@ extension SimpleSerializedCoreDataStorable {
     /// DO NOT OVERRIDE.
     internal static func _get(
         with manager: SimpleSerializedCoreDataManageable?,
-        alterFetchRequest: @escaping AlterFetchRequestClosure<EntityType>
+        alterFetchRequest: @escaping AlterFetchRequest<EntityType>
     ) -> Self? {
         let manager = manager ?? defaultManager
         let one: Self? = manager.getValue(alterFetchRequest: alterFetchRequest)
         return one
+    }
+
+    /// Protocol conformance.
+    /// Gets the struct to match the core data request.
+    public static func getCount(
+        with manager: SimpleSerializedCoreDataManageable?,
+        alterFetchRequest: @escaping AlterFetchRequest<EntityType>
+    ) -> Int {
+        let manager = manager ?? defaultManager
+        return manager.getCount(alterFetchRequest: alterFetchRequest)
+    }
+    
+    /// Convenience version of getCount:manager:alterFetchRequest (manager not required).
+    public static func getCount(
+        alterFetchRequest: @escaping AlterFetchRequest<EntityType>
+    ) -> Int {
+        return getCount(with: nil, alterFetchRequest: alterFetchRequest)
+    }
+    
+    /// Convenience version of getCount:manager:alterFetchRequest (alterFetchRequest not required).
+    public static func getCount(
+        with manager: SimpleSerializedCoreDataManageable?
+    ) -> Int {
+        return getCount(with: manager, alterFetchRequest: { _ in })
+    }
+    
+    /// Convenience version of getCount:manager:alterFetchRequest (no parameters required).
+    public static func getCount() -> Int {
+        return getCount(with: nil) { (fetchRequest: NSFetchRequest<EntityType>) in }
     }
     
     /// Protocol conformance.
     /// Gets all structs that match the core data request.
     public static func getAll(
         with manager: SimpleSerializedCoreDataManageable?,
-        alterFetchRequest: @escaping AlterFetchRequestClosure<EntityType>
+        alterFetchRequest: @escaping AlterFetchRequest<EntityType>
     ) -> [Self] {
         return _getAll(with: manager, alterFetchRequest: alterFetchRequest)
     }
     
     /// Convenience version of getAll:manager:alterFetchRequest (manager not required).
     public static func getAll(
-        alterFetchRequest: @escaping AlterFetchRequestClosure<EntityType>
+        alterFetchRequest: @escaping AlterFetchRequest<EntityType>
     ) -> [Self] {
         return getAll(with: nil, alterFetchRequest: alterFetchRequest)
+    }
+    
+    /// Convenience version of getAll:manager:alterFetchRequest (alterFetchRequest not required).
+    public static func getAll(
+        with manager: SimpleSerializedCoreDataManageable?
+    ) -> [Self] {
+        return getAll(with: manager) { _ in }
     }
     
     /// Convenience version of getAll:manager:alterFetchRequest (no parameters required).
@@ -159,7 +209,7 @@ extension SimpleSerializedCoreDataStorable {
     /// DO NOT OVERRIDE.
     internal static func _getAll(
         with manager: SimpleSerializedCoreDataManageable?,
-        alterFetchRequest: @escaping AlterFetchRequestClosure<EntityType>
+        alterFetchRequest: @escaping AlterFetchRequest<EntityType>
     ) -> [Self] {
         let manager = manager ?? defaultManager
         let all: [Self] = manager.getAllValues(alterFetchRequest: alterFetchRequest)
@@ -219,7 +269,7 @@ extension SimpleSerializedCoreDataStorable {
     /// Deletes all rows that match the core data request.
     public static func deleteAll(
         with manager: SimpleSerializedCoreDataManageable?,
-        alterFetchRequest: @escaping AlterFetchRequestClosure<EntityType>
+        alterFetchRequest: @escaping AlterFetchRequest<EntityType>
     ) -> Bool {
         let manager = manager ?? defaultManager
         let isDeleted = manager.deleteAll(alterFetchRequest: alterFetchRequest)
@@ -228,9 +278,16 @@ extension SimpleSerializedCoreDataStorable {
     
     /// Convenience version of deleteAll:manager:alterFetchRequest (manager not required).
     public static func deleteAll(
-        alterFetchRequest: @escaping AlterFetchRequestClosure<EntityType>
+        alterFetchRequest: @escaping AlterFetchRequest<EntityType>
     ) -> Bool {
         return deleteAll(with: nil, alterFetchRequest: alterFetchRequest)
+    }
+    
+    /// Convenience version of deleteAll:manager:alterFetchRequest (alterFetchRequest not required).
+    public static func deleteAll(
+        with manager: SimpleSerializedCoreDataManageable?
+    ) -> Bool {
+        return deleteAll(with: manager) { _ in }
     }
     
     /// Convenience version of deleteAll:manager:alterFetchRequest (no parameters required).

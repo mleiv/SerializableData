@@ -11,7 +11,7 @@ import XCTest
 
 class SerializableDataDemoTests: XCTestCase {
 
-    let sampleJson = "{\"persons\":[{\"name\" : \"Phil Myman\", \"profession\" : \"R&D Lab Scientist\", \"organization\" : \"Veridian Dynamics\", \"notes\" : \"You know what you did.\", \"createdDate\" : \"2010-03-18 19:05:15\", \"modifiedDate\" : \"2010-01-26 20:00:09\"}, {\"name\" : \"Veronica Palmer\", \"profession\" : \"Executive\", \"organization\" : \"Veridian Dynamics\", \"notes\" : \"Friendship. It's the same as stealing.\", \"createdDate\" : \"2010-03-18 19:00:07\", \"modifiedDate\" : \"2010-01-26 23:17:20\"}]}"
+    let sampleJson = "{\"persons\":[{\"id\": \"\(UUID())\", \"name\" : \"Phil Myman\", \"profession\" : \"R&D Lab Scientist\", \"organization\" : \"Veridian Dynamics\", \"notes\" : \"You know what you did.\", \"createdDate\" : \"2010-03-18 19:05:15\", \"modifiedDate\" : \"2010-01-26 20:00:09\"}, {\"id\": \"\(UUID())\", \"name\" : \"Veronica Palmer\", \"profession\" : \"Executive\", \"organization\" : \"Veridian Dynamics\", \"notes\" : \"Friendship. It's the same as stealing.\", \"createdDate\" : \"2010-03-18 19:00:07\", \"modifiedDate\" : \"2010-01-26 23:17:20\"}]}"
     let oneDay = TimeInterval(24 * 60 * 60)
     var sevenYearsAgo = Date()
     var fiveYearsAgo = Date()

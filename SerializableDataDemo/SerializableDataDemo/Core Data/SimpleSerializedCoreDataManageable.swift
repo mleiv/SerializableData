@@ -14,37 +14,45 @@ public protocol SimpleSerializedCoreDataManageable: SimpleCoreDataManageable {
 }
 
 extension SimpleSerializedCoreDataManageable {
+    public typealias AlterFetchRequest<T: NSManagedObject> = ((NSFetchRequest<T>)->Void)
     
     /// Retrieve single row with criteria closure.
     public func getValue<T: SimpleSerializedCoreDataStorable>(
-        alterFetchRequest: @escaping AlterFetchRequestClosure<T.EntityType>
+        alterFetchRequest: @escaping AlterFetchRequest<T.EntityType>
     ) -> T? {
-        if let coreItem = getOne(alterFetchRequest: alterFetchRequest),
-            let serializedData = coreItem.value(forKey: self.serializedDataKey) as? Data {
-            return T(serializedData: serializedData)
+        var result: T?
+        autoreleasepool {
+            if let coreItem = getOne(alterFetchRequest: alterFetchRequest),
+                let serializedData = coreItem.value(forKey: self.serializedDataKey) as? Data,
+                let item = T(serializedData: serializedData) {
+                result = item
+            }
         }
-        return nil
+        return result
     }
     
     /// Retrieve object row with criteria closure.
     public func getObject<T: SimpleSerializedCoreDataStorable>(
         item: T
+//        completion: @escaping GetObjectCompletion<T.EntityType>
     ) -> T.EntityType? {
-        return getOne() { (fetchRequest: NSFetchRequest<T.EntityType>) in
+        return getOne { (fetchRequest: NSFetchRequest<T.EntityType>) in
             item.setIdentifyingPredicate(fetchRequest: fetchRequest)
         }
     }
     
     /// Retrieve multiple rows with criteria closure.
     public func getAllValues<T: SimpleSerializedCoreDataStorable>(
-        alterFetchRequest: @escaping AlterFetchRequestClosure<T.EntityType>
+        alterFetchRequest: @escaping AlterFetchRequest<T.EntityType>
     ) -> [T] {
         var result: [T] = []
-        let coreItems: [T.EntityType] = getAll(alterFetchRequest: alterFetchRequest)
-        for coreItem in coreItems {
-            if let serializedData = coreItem.value(forKey: self.serializedDataKey) as? Data,
-               let t = T(serializedData: serializedData) {
-                result.append(t)
+        autoreleasepool {
+            let coreItems: [T.EntityType] = getAll(alterFetchRequest: alterFetchRequest)
+            for coreItem in coreItems {
+                if let serializedData = coreItem.value(forKey: self.serializedDataKey) as? Data,
+                   let t = T(serializedData: serializedData) {
+                    result.append(t)
+                }
             }
         }
         return result
@@ -54,25 +62,7 @@ extension SimpleSerializedCoreDataManageable {
     public func saveValue<T: SimpleSerializedCoreDataStorable>(
         item: T
     ) -> Bool {
-        var result: Bool = false
-        let waitForEndTask = DispatchWorkItem() {} // semaphore flag
-        persistentContainer.performBackgroundTask { moc in
-            defer { waitForEndTask.perform() }
-            moc.automaticallyMergesChangesFromParent = true
-            moc.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
-            autoreleasepool {
-                let coreItem = item.entity(context: moc) ?? T.EntityType(context: moc)
-                item.setColumnsOnSave(coreItem: coreItem)
-            }
-            do {
-                try moc.save()
-                result = true
-            } catch let saveError as NSError {
-                print("Error: save failed for \(T.self): \(saveError)")
-            }
-        }
-        waitForEndTask.wait()
-        return result
+        return saveAllValues(items: [item])
     }
 
     /// Save multiple rows.

@@ -14,8 +14,8 @@ struct SimpleCoreDataManager: SimpleSerializedCoreDataManageable {
     public static let defaultStoreName = "SerializableDataDemo"
     public var serializedDataKey: String { return "serializedData" }
     
-    public static var current: SimpleCoreDataManageable { return currentSerializable }
-    public static var currentSerializable: SimpleSerializedCoreDataManageable = SimpleCoreDataManager(storeName: defaultStoreName)
+    public static var current: SimpleCoreDataManageable { return serializableCurrent }
+    public static var serializableCurrent: SimpleSerializedCoreDataManageable = SimpleCoreDataManager(storeName: defaultStoreName)
 
     public static var isManageMigrations: Bool = true // we manage migrations
     

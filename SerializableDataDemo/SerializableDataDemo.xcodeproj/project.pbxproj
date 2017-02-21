@@ -25,13 +25,17 @@
 		B04F6D541BD1CB9800790FB3 /* UserDefaultsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B04F6D481BD1CB9800790FB3 /* UserDefaultsManager.swift */; };
 		B04F6D551BD1CB9800790FB3 /* UserDefaultsPerson.swift in Sources */ = {isa = PBXBuildFile; fileRef = B04F6D491BD1CB9800790FB3 /* UserDefaultsPerson.swift */; };
 		B04F6D561BD1CB9800790FB3 /* UserDefaultsStorable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B04F6D4A1BD1CB9800790FB3 /* UserDefaultsStorable.swift */; };
-		B04F6D5C1BD1CC8100790FB3 /* SerializableDataDemo.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B04F6D5A1BD1CC8100790FB3 /* SerializableDataDemo.xcdatamodeld */; };
 		B11911181E5784A500BF7E06 /* SimpleSerializedCoreDataManageable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B11911171E5784A500BF7E06 /* SimpleSerializedCoreDataManageable.swift */; };
 		B12E98C51E56487000F0A577 /* CoreDataStructuralMigrations.swift in Sources */ = {isa = PBXBuildFile; fileRef = B12E98C41E56487000F0A577 /* CoreDataStructuralMigrations.swift */; };
 		B12E98C71E56494E00F0A577 /* MoveStore20170211.swift in Sources */ = {isa = PBXBuildFile; fileRef = B12E98C61E56494E00F0A577 /* MoveStore20170211.swift */; };
 		B1C67CB71E4C56BA0035B138 /* Migration3.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C67CB61E4C56BA0035B138 /* Migration3.swift */; };
 		B1CC5D051E5AAC9E007E0589 /* SimpleCoreDataManageable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1CC5D031E5AAC9E007E0589 /* SimpleCoreDataManageable.swift */; };
 		B1CC5D081E5AACB4007E0589 /* SimpleCoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1CC5D071E5AACB4007E0589 /* SimpleCoreDataManager.swift */; };
+		B1CC5D121E5B8FDB007E0589 /* CoreDataPersonCRUDTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1CC5D101E5B8FDB007E0589 /* CoreDataPersonCRUDTests.swift */; };
+		B1CC5D131E5B8FDB007E0589 /* CoreDataSandboxedPersonCRUDTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1CC5D111E5B8FDB007E0589 /* CoreDataSandboxedPersonCRUDTests.swift */; };
+		B1CC5D181E5B9228007E0589 /* Migration4.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1CC5D171E5B9228007E0589 /* Migration4.swift */; };
+		B1CC5D251E5BA560007E0589 /* Migration4.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = B1CC5D241E5BA560007E0589 /* Migration4.xcmappingmodel */; };
+		B1CC5D2C1E5BA936007E0589 /* SerializableDataDemo.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B1CC5D271E5BA936007E0589 /* SerializableDataDemo.xcdatamodeld */; };
 		B1E427031E4D68B0002C28E5 /* Migration3.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = B1E427021E4D68B0002C28E5 /* Migration3.xcmappingmodel */; };
 /* End PBXBuildFile section */
 
@@ -68,15 +72,21 @@
 		B04F6D481BD1CB9800790FB3 /* UserDefaultsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserDefaultsManager.swift; sourceTree = "<group>"; };
 		B04F6D491BD1CB9800790FB3 /* UserDefaultsPerson.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserDefaultsPerson.swift; sourceTree = "<group>"; };
 		B04F6D4A1BD1CB9800790FB3 /* UserDefaultsStorable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserDefaultsStorable.swift; sourceTree = "<group>"; };
-		B04F6D5B1BD1CC8100790FB3 /* SerializableDataDemo.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SerializableDataDemo.xcdatamodel; sourceTree = "<group>"; };
 		B11911171E5784A500BF7E06 /* SimpleSerializedCoreDataManageable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SimpleSerializedCoreDataManageable.swift; sourceTree = "<group>"; };
 		B12E98C41E56487000F0A577 /* CoreDataStructuralMigrations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataStructuralMigrations.swift; sourceTree = "<group>"; };
 		B12E98C61E56494E00F0A577 /* MoveStore20170211.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MoveStore20170211.swift; sourceTree = "<group>"; };
 		B1C67CB61E4C56BA0035B138 /* Migration3.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Migration3.swift; sourceTree = "<group>"; };
-		B1C67CB81E4C56C60035B138 /* SerializableDataDemo2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SerializableDataDemo2.xcdatamodel; sourceTree = "<group>"; };
 		B1CC5D031E5AAC9E007E0589 /* SimpleCoreDataManageable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SimpleCoreDataManageable.swift; sourceTree = "<group>"; };
 		B1CC5D071E5AACB4007E0589 /* SimpleCoreDataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SimpleCoreDataManager.swift; sourceTree = "<group>"; };
-		B1E427011E4D6874002C28E5 /* SerializableDataDemo3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SerializableDataDemo3.xcdatamodel; sourceTree = "<group>"; };
+		B1CC5D101E5B8FDB007E0589 /* CoreDataPersonCRUDTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataPersonCRUDTests.swift; sourceTree = "<group>"; };
+		B1CC5D111E5B8FDB007E0589 /* CoreDataSandboxedPersonCRUDTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataSandboxedPersonCRUDTests.swift; sourceTree = "<group>"; };
+		B1CC5D171E5B9228007E0589 /* Migration4.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Migration4.swift; sourceTree = "<group>"; };
+		B1CC5D241E5BA560007E0589 /* Migration4.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = Migration4.xcmappingmodel; sourceTree = "<group>"; };
+		B1CC5D281E5BA936007E0589 /* SerializableDataDemo.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SerializableDataDemo.xcdatamodel; sourceTree = "<group>"; };
+		B1CC5D291E5BA936007E0589 /* SerializableDataDemo2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SerializableDataDemo2.xcdatamodel; sourceTree = "<group>"; };
+		B1CC5D2A1E5BA936007E0589 /* SerializableDataDemo3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SerializableDataDemo3.xcdatamodel; sourceTree = "<group>"; };
+		B1CC5D2B1E5BA936007E0589 /* SerializableDataDemo4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SerializableDataDemo4.xcdatamodel; sourceTree = "<group>"; };
+		B1CC5D2D1E5BACC5007E0589 /* SerializableDataDemo5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SerializableDataDemo5.xcdatamodel; sourceTree = "<group>"; };
 		B1E427021E4D68B0002C28E5 /* Migration3.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = Migration3.xcmappingmodel; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -121,7 +131,6 @@
 			children = (
 				B04F6D0C1BD1CAFA00790FB3 /* AppDelegate.swift */,
 				B04F6D431BD1CB9800790FB3 /* SerializableData */,
-				B04F6D401BD1CB9800790FB3 /* Extensions */,
 				B04F6D3A1BD1CB9800790FB3 /* Core Data */,
 				B04F6D471BD1CB9800790FB3 /* User Defaults */,
 				B04F6D101BD1CAFA00790FB3 /* Main.storyboard */,
@@ -138,6 +147,7 @@
 		B04F6D231BD1CAFA00790FB3 /* SerializableDataDemoTests */ = {
 			isa = PBXGroup;
 			children = (
+				B1CC5D0A1E5B8F93007E0589 /* Person */,
 				B04F6D241BD1CAFA00790FB3 /* SerializableDataDemoTests.swift */,
 				B04F6D261BD1CAFA00790FB3 /* Info.plist */,
 			);
@@ -157,8 +167,8 @@
 		B04F6D3A1BD1CB9800790FB3 /* Core Data */ = {
 			isa = PBXGroup;
 			children = (
-				B04F6D5A1BD1CC8100790FB3 /* SerializableDataDemo.xcdatamodeld */,
 				B04F6D3C1BD1CB9800790FB3 /* CoreDataPerson.swift */,
+				B1CC5D271E5BA936007E0589 /* SerializableDataDemo.xcdatamodeld */,
 				B1CC5D071E5AACB4007E0589 /* SimpleCoreDataManager.swift */,
 				B1CC5D031E5AAC9E007E0589 /* SimpleCoreDataManageable.swift */,
 				B11911171E5784A500BF7E06 /* SimpleSerializedCoreDataManageable.swift */,
@@ -166,13 +176,6 @@
 				B1C67CB51E4C56BA0035B138 /* Migrations */,
 			);
 			path = "Core Data";
-			sourceTree = "<group>";
-		};
-		B04F6D401BD1CB9800790FB3 /* Extensions */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Extensions;
 			sourceTree = "<group>";
 		};
 		B04F6D431BD1CB9800790FB3 /* SerializableData */ = {
@@ -199,11 +202,30 @@
 			isa = PBXGroup;
 			children = (
 				B12E98C41E56487000F0A577 /* CoreDataStructuralMigrations.swift */,
-				B12E98C61E56494E00F0A577 /* MoveStore20170211.swift */,
 				B1C67CB61E4C56BA0035B138 /* Migration3.swift */,
 				B1E427021E4D68B0002C28E5 /* Migration3.xcmappingmodel */,
+				B1CC5D171E5B9228007E0589 /* Migration4.swift */,
+				B1CC5D241E5BA560007E0589 /* Migration4.xcmappingmodel */,
+				B12E98C61E56494E00F0A577 /* MoveStore20170211.swift */,
 			);
 			path = Migrations;
+			sourceTree = "<group>";
+		};
+		B1CC5D0A1E5B8F93007E0589 /* Person */ = {
+			isa = PBXGroup;
+			children = (
+				B1CC5D0F1E5B8FDB007E0589 /* CoreData */,
+			);
+			path = Person;
+			sourceTree = "<group>";
+		};
+		B1CC5D0F1E5B8FDB007E0589 /* CoreData */ = {
+			isa = PBXGroup;
+			children = (
+				B1CC5D101E5B8FDB007E0589 /* CoreDataPersonCRUDTests.swift */,
+				B1CC5D111E5B8FDB007E0589 /* CoreDataSandboxedPersonCRUDTests.swift */,
+			);
+			path = CoreData;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -314,9 +336,11 @@
 				B04F6D561BD1CB9800790FB3 /* UserDefaultsStorable.swift in Sources */,
 				B04F6D541BD1CB9800790FB3 /* UserDefaultsManager.swift in Sources */,
 				B12E98C71E56494E00F0A577 /* MoveStore20170211.swift in Sources */,
-				B04F6D5C1BD1CC8100790FB3 /* SerializableDataDemo.xcdatamodeld in Sources */,
+				B1CC5D2C1E5BA936007E0589 /* SerializableDataDemo.xcdatamodeld in Sources */,
+				B1CC5D251E5BA560007E0589 /* Migration4.xcmappingmodel in Sources */,
 				B04F6D381BD1CB7900790FB3 /* UserDefaultsPersonsController.swift in Sources */,
 				B1CC5D081E5AACB4007E0589 /* SimpleCoreDataManager.swift in Sources */,
+				B1CC5D181E5B9228007E0589 /* Migration4.swift in Sources */,
 				B11911181E5784A500BF7E06 /* SimpleSerializedCoreDataManageable.swift in Sources */,
 				B04F6D511BD1CB9800790FB3 /* SerializableData.swift in Sources */,
 				B04F6D521BD1CB9800790FB3 /* SerializedDataRetrievable.swift in Sources */,
@@ -338,7 +362,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B1CC5D121E5B8FDB007E0589 /* CoreDataPersonCRUDTests.swift in Sources */,
 				B04F6D251BD1CAFA00790FB3 /* SerializableDataDemoTests.swift in Sources */,
+				B1CC5D131E5B8FDB007E0589 /* CoreDataSandboxedPersonCRUDTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -543,14 +569,16 @@
 /* End XCConfigurationList section */
 
 /* Begin XCVersionGroup section */
-		B04F6D5A1BD1CC8100790FB3 /* SerializableDataDemo.xcdatamodeld */ = {
+		B1CC5D271E5BA936007E0589 /* SerializableDataDemo.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
-				B1E427011E4D6874002C28E5 /* SerializableDataDemo3.xcdatamodel */,
-				B1C67CB81E4C56C60035B138 /* SerializableDataDemo2.xcdatamodel */,
-				B04F6D5B1BD1CC8100790FB3 /* SerializableDataDemo.xcdatamodel */,
+				B1CC5D2D1E5BACC5007E0589 /* SerializableDataDemo5.xcdatamodel */,
+				B1CC5D281E5BA936007E0589 /* SerializableDataDemo.xcdatamodel */,
+				B1CC5D291E5BA936007E0589 /* SerializableDataDemo2.xcdatamodel */,
+				B1CC5D2A1E5BA936007E0589 /* SerializableDataDemo3.xcdatamodel */,
+				B1CC5D2B1E5BA936007E0589 /* SerializableDataDemo4.xcdatamodel */,
 			);
-			currentVersion = B1E427011E4D6874002C28E5 /* SerializableDataDemo3.xcdatamodel */;
+			currentVersion = B1CC5D2D1E5BACC5007E0589 /* SerializableDataDemo5.xcdatamodel */;
 			path = SerializableDataDemo.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

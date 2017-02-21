@@ -16,6 +16,8 @@ public struct CoreDataStructuralMigrations {
         "SerializableDataDemo",
         "SerializableDataDemo2",
         "SerializableDataDemo3",
+        "SerializableDataDemo4",
+        "SerializableDataDemo5",
     ]
     
     enum MigrationError: String, Error {
