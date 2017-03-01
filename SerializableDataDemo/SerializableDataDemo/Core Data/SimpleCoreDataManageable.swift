@@ -162,6 +162,8 @@ extension SimpleCoreDataManageable {
     /// The closure type for editing fetched entity objects.
     public typealias SetAdditionalColumns<T: NSManagedObject> = ((T)->Void)
     
+    public typealias TransformEntity<T: NSManagedObject, U> = ((T)->U?)
+    
     /// Save the primary context to file. Call this before exiting App.current.
     public func save() {
         let moc = persistentContainer.viewContext
@@ -182,8 +184,8 @@ extension SimpleCoreDataManageable {
     public func getOne<T: NSManagedObject>(
         alterFetchRequest: @escaping AlterFetchRequest<T>
     ) -> T? {
-        var result: T?
         let moc = context
+        var result: T?
         moc.performAndWait {
             guard let fetchRequest = T.fetchRequest() as? NSFetchRequest<T> else { return }
             alterFetchRequest(fetchRequest)
@@ -192,6 +194,30 @@ extension SimpleCoreDataManageable {
                 do {
                     if let item = try fetchRequest.execute().first {
                         result = item
+                    }
+                } catch let fetchError as NSError {
+                    print("Error: get failed for \(T.self): \(fetchError)")
+                }
+            }
+        }
+        return result
+    }
+    
+    /// Retrieve multiple rows with criteria closure, and transform them to another data type.
+    public func getOneTransformed<T: NSManagedObject, U>(
+        transformEntity: @escaping TransformEntity<T,U>,
+        alterFetchRequest: @escaping AlterFetchRequest<T>
+    ) -> U? {
+        let moc = context
+        var result: U?
+        moc.performAndWait {
+            guard let fetchRequest = T.fetchRequest() as? NSFetchRequest<T> else { return }
+            alterFetchRequest(fetchRequest)
+            fetchRequest.fetchLimit = 1
+            autoreleasepool {
+                do {
+                    if let item = try fetchRequest.execute().first {
+                        result = transformEntity(item)
                     }
                 } catch let fetchError as NSError {
                     print("Error: get failed for \(T.self): \(fetchError)")
@@ -214,6 +240,26 @@ extension SimpleCoreDataManageable {
                 result = try fetchRequest.execute()
             } catch let fetchError as NSError {
                 print("Error: getAll failed: \(fetchError)")
+            }
+        }
+        return result
+    }
+    
+    /// Retrieve multiple rows with criteria closure, and transform them to another data type.
+    public func getAllTransformed<T: NSManagedObject, U>(
+        transformEntity: @escaping TransformEntity<T,U>,
+        alterFetchRequest: @escaping AlterFetchRequest<T>
+    ) -> [U] {
+        let moc = context
+        var result: [U] = []
+        moc.performAndWait { // performAndWait does not require autoreleasepool
+            guard let fetchRequest = T.fetchRequest() as? NSFetchRequest<T> else { return }
+            alterFetchRequest(fetchRequest)
+            do {
+                let items: [T] = try fetchRequest.execute()
+                result = items.flatMap { transformEntity($0) }
+            } catch let fetchError as NSError {
+                print("Error: getAllTransformed failed: \(fetchError)")
             }
         }
         return result

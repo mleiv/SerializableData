@@ -21,13 +21,13 @@ extension SimpleSerializedCoreDataManageable {
     public func getValue<T: SimpleSerializedCoreDataStorable>(
         alterFetchRequest: @escaping AlterFetchRequest<T.EntityType>
     ) -> T? {
-        let moc = context
         var result: T?
-        // do any core object property examination in the correct context
-        moc.performAndWait {
-            if let coreItem = self.getOne(alterFetchRequest: alterFetchRequest) {
-                result = T(coreItem: coreItem)
-            }
+        // release objective-c objects when done
+        autoreleasepool {
+            result = self.getOneTransformed(
+                transformEntity: { T(coreItem: $0) },
+                alterFetchRequest: alterFetchRequest
+            )
         }
         return result
     }
@@ -46,16 +46,13 @@ extension SimpleSerializedCoreDataManageable {
     public func getAllValues<T: SimpleSerializedCoreDataStorable>(
         alterFetchRequest: @escaping AlterFetchRequest<T.EntityType>
     ) -> [T] {
-        let moc = context
         var result: [T] = []
-        // do any core object property examination in the correct context
-        moc.performAndWait {
-            let coreItems: [T.EntityType] = self.getAll(alterFetchRequest: alterFetchRequest)
-            for coreItem in coreItems {
-                if let item = T(coreItem: coreItem) {
-                    result.append(item)
-                }
-            }
+        // release objective-c objects when done
+        autoreleasepool {
+            result = self.getAllTransformed(
+                transformEntity: { T(coreItem: $0) },
+                alterFetchRequest: alterFetchRequest
+            )
         }
         return result
     }

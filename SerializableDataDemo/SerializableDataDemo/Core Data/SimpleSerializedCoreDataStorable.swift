@@ -119,6 +119,7 @@ extension SimpleSerializedCoreDataStorable {
     /// (Protocol default)
     /// Initializes value type from core data object with serialized data.
     public init?(coreItem: EntityType) {
+        // Warning: make sure parent runs this in the correct context/thread for this entity
         if let serializedData = coreItem.value(forKey: Self.serializedDataKey) as? Data {
             self.init(serializedData: serializedData)
             return
