@@ -98,7 +98,7 @@ extension CoreDataPerson: SimpleSerializedCoreDataStorable {
     public typealias EntityType = Persons
     
     /// Reference to current core data manager.
-    public static var defaultManager: SimpleSerializedCoreDataManageable { return SimpleCoreDataManager.serializableCurrent }
+    public static var defaultManager: SimpleSerializedCoreDataManageable { return SimpleCoreDataManager.current }
     
     /// Copy this person's values to core data row.
     public func setAdditionalColumnsOnSave(

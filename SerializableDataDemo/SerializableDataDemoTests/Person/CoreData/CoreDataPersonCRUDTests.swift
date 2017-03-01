@@ -15,7 +15,7 @@ class CoreDataPersonCRUDTests: XCTestCase {
     
     override func setUp() {
         super.setUp()
-        SimpleCoreDataManager.serializableCurrent = getSandboxedManager()
+        SimpleCoreDataManager.current = getSandboxedManager()
     }
     
     override func tearDown() {
@@ -23,7 +23,7 @@ class CoreDataPersonCRUDTests: XCTestCase {
         super.tearDown()
     }
     
-    private func getSandboxedManager() -> SimpleSerializedCoreDataManageable {
+    private func getSandboxedManager() -> SimpleCoreDataManager {
         return SimpleCoreDataManager(storeName: SimpleCoreDataManager.defaultStoreName, isConfineToMemoryStore: true)
     }
     

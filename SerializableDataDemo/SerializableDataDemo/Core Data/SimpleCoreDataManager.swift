@@ -10,14 +10,13 @@
 import CoreData
 
 struct SimpleCoreDataManager: SimpleSerializedCoreDataManageable {
-
     public static let defaultStoreName = "SerializableDataDemo"
     public var serializedDataKey: String { return "serializedData" }
     
-    public static var current: SimpleCoreDataManageable { return serializableCurrent }
-    public static var serializableCurrent: SimpleSerializedCoreDataManageable = SimpleCoreDataManager(storeName: defaultStoreName)
+    public static var current: SimpleCoreDataManager = SimpleCoreDataManager(storeName: defaultStoreName)
 
     public static var isManageMigrations: Bool = true // we manage migrations
+    public var isConfinedToMemoryStore: Bool = false
     
     public let storeName: String
     public let persistentContainer: NSPersistentContainer

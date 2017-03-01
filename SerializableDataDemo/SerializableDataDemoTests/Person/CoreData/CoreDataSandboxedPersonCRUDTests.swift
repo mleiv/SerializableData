@@ -21,7 +21,7 @@ class CoreDataSandboxedPersonCRUDTests: XCTestCase {
         super.tearDown()
     }
     
-    private func getSandboxedManager() -> SimpleSerializedCoreDataManageable {
+    private func getSandboxedManager() -> SimpleCoreDataManager {
         return SimpleCoreDataManager(storeName: SimpleCoreDataManager.defaultStoreName, isConfineToMemoryStore: true)
     }
     

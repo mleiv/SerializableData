@@ -18,7 +18,7 @@ class SerializableDataDemoTests: XCTestCase {
     
     override func setUp() {
         super.setUp()
-        SimpleCoreDataManager.serializableCurrent = getSandboxedManager()
+        SimpleCoreDataManager.current = getSandboxedManager()
         sevenYearsAgo = Date(timeIntervalSinceNow: (-self.oneDay) * 365 * 7)
         fiveYearsAgo = Date(timeIntervalSinceNow: (-self.oneDay) * 365 * 5)
     }
@@ -27,7 +27,7 @@ class SerializableDataDemoTests: XCTestCase {
         super.tearDown()
     }
     
-    private func getSandboxedManager() -> SimpleSerializedCoreDataManageable {
+    private func getSandboxedManager() -> SimpleCoreDataManager {
         return SimpleCoreDataManager(storeName: SimpleCoreDataManager.defaultStoreName, isConfineToMemoryStore: true)
     }
     

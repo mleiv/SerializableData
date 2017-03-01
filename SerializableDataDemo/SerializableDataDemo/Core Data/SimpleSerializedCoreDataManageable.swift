@@ -10,22 +10,23 @@
 import CoreData
 
 public protocol SimpleSerializedCoreDataManageable: SimpleCoreDataManageable {
-    var serializedDataKey: String { get }
 }
 
 extension SimpleSerializedCoreDataManageable {
+    /// The closure type for editing fetch requests.
+    /// (Duplicate these per file or use Whole Module Optimization, which is slow in dev)
     public typealias AlterFetchRequest<T: NSManagedObject> = ((NSFetchRequest<T>)->Void)
     
     /// Retrieve single row with criteria closure.
     public func getValue<T: SimpleSerializedCoreDataStorable>(
         alterFetchRequest: @escaping AlterFetchRequest<T.EntityType>
     ) -> T? {
+        let moc = context
         var result: T?
-        autoreleasepool {
-            if let coreItem = getOne(alterFetchRequest: alterFetchRequest),
-                let serializedData = coreItem.value(forKey: self.serializedDataKey) as? Data,
-                let item = T(serializedData: serializedData) {
-                result = item
+        // do any core object property examination in the correct context
+        moc.performAndWait {
+            if let coreItem = self.getOne(alterFetchRequest: alterFetchRequest) {
+                result = T(coreItem: coreItem)
             }
         }
         return result
@@ -45,13 +46,14 @@ extension SimpleSerializedCoreDataManageable {
     public func getAllValues<T: SimpleSerializedCoreDataStorable>(
         alterFetchRequest: @escaping AlterFetchRequest<T.EntityType>
     ) -> [T] {
+        let moc = context
         var result: [T] = []
-        autoreleasepool {
-            let coreItems: [T.EntityType] = getAll(alterFetchRequest: alterFetchRequest)
+        // do any core object property examination in the correct context
+        moc.performAndWait {
+            let coreItems: [T.EntityType] = self.getAll(alterFetchRequest: alterFetchRequest)
             for coreItem in coreItems {
-                if let serializedData = coreItem.value(forKey: self.serializedDataKey) as? Data,
-                   let t = T(serializedData: serializedData) {
-                    result.append(t)
+                if let item = T(coreItem: coreItem) {
+                    result.append(item)
                 }
             }
         }
@@ -76,6 +78,7 @@ extension SimpleSerializedCoreDataManageable {
             defer { waitForEndTask.perform() }
             moc.automaticallyMergesChangesFromParent = true
             moc.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
+            // release any objective-c objects
             autoreleasepool {
                 for item in items {
                     let coreItem = item.entity(context: moc) ?? T.EntityType(context: moc)

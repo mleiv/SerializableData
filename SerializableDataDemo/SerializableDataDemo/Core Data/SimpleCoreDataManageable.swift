@@ -15,11 +15,10 @@ public protocol SimpleCoreDataManageable {
 
 //MARK: Required:
 
-    /// A static core data container for easy/efficient access.
-    /// FYI, this is only created when asked for.
-    static var current: SimpleCoreDataManageable { get }
     /// Prevents any automatic migrations - useful for heavy migrations.
     static var isManageMigrations: Bool { get }
+    /// A flag for the type of store.
+    var isConfinedToMemoryStore: Bool { get }
     /// The store name of the current persistent store container.
     var storeName: String { get }
     /// This is managed for you - just declare it.
@@ -33,7 +32,7 @@ public protocol SimpleCoreDataManageable {
     
     func runMigrations(storeUrl: URL)
     
-    /// Save the primary context to file. Call this before exiting app.
+    /// Save the primary context to file. Call this before exiting App.current.
     func save()
     
     /// Retrieve single row with criteria closure.
@@ -157,10 +156,13 @@ extension SimpleCoreDataManageable {
 
 // MARK: Core data content functions
 extension SimpleCoreDataManageable {
+    /// The closure type for editing fetch requests.
     public typealias AlterFetchRequest<T: NSManagedObject> = ((NSFetchRequest<T>)->Void)
+    
+    /// The closure type for editing fetched entity objects.
     public typealias SetAdditionalColumns<T: NSManagedObject> = ((T)->Void)
     
-    /// Save the primary context to file. Call this before exiting app.
+    /// Save the primary context to file. Call this before exiting App.current.
     public func save() {
         let moc = persistentContainer.viewContext
         moc.performAndWait {
@@ -182,7 +184,6 @@ extension SimpleCoreDataManageable {
     ) -> T? {
         var result: T?
         let moc = context
-        print(context)
         moc.performAndWait {
             guard let fetchRequest = T.fetchRequest() as? NSFetchRequest<T> else { return }
             alterFetchRequest(fetchRequest)
