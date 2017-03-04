@@ -22,12 +22,11 @@ extension SimpleSerializedCoreDataManageable {
         alterFetchRequest: @escaping AlterFetchRequest<T.EntityType>
     ) -> T? {
         var result: T?
-        // release objective-c objects when done
-        autoreleasepool {
-            result = self.getOneTransformed(
-                transformEntity: { T(coreItem: $0) },
-                alterFetchRequest: alterFetchRequest
-            )
+        if let data: Data = self.getOneTransformed(
+            transformEntity: { $0.value(forKey: T.serializedDataKey) as? Data },
+            alterFetchRequest: alterFetchRequest
+        ) {
+            result = T(serializedData: data)
         }
         return result
     }
@@ -47,13 +46,11 @@ extension SimpleSerializedCoreDataManageable {
         alterFetchRequest: @escaping AlterFetchRequest<T.EntityType>
     ) -> [T] {
         var result: [T] = []
-        // release objective-c objects when done
-        autoreleasepool {
-            result = self.getAllTransformed(
-                transformEntity: { T(coreItem: $0) },
-                alterFetchRequest: alterFetchRequest
-            )
-        }
+        let data: [Data] = self.getAllTransformed(
+            transformEntity: { $0.value(forKey: T.serializedDataKey) as? Data },
+            alterFetchRequest: alterFetchRequest
+        )
+        result = data.flatMap { T(serializedData: $0) }
         return result
     }
 

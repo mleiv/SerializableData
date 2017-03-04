@@ -82,6 +82,14 @@ public protocol SimpleCoreDataManageable {
 
 // MARK: Core data initialization functions
 extension SimpleCoreDataManageable {
+
+    static var isCoreDataInaccessible: Bool {
+        #if TARGET_INTERFACE_BUILDER
+            return true
+        #else
+            return false
+        #endif
+    }
     
     public var context: NSManagedObjectContext { return specificContext ?? persistentContainer.viewContext }
     
@@ -107,6 +115,9 @@ extension SimpleCoreDataManageable {
     /// Configure the persistent container.
     /// Also runs any manual migrations.
     public func initContainer(isConfineToMemoryStore: Bool = false) {
+    
+        guard !Self.isCoreDataInaccessible else { return }
+        
         let isManageMigrations = Self.isManageMigrations
         
         // find our persistent store file
@@ -166,6 +177,7 @@ extension SimpleCoreDataManageable {
     
     /// Save the primary context to file. Call this before exiting App.current.
     public func save() {
+        guard !Self.isCoreDataInaccessible else { return }
         let moc = persistentContainer.viewContext
         moc.performAndWait {
             do {
@@ -184,6 +196,7 @@ extension SimpleCoreDataManageable {
     public func getOne<T: NSManagedObject>(
         alterFetchRequest: @escaping AlterFetchRequest<T>
     ) -> T? {
+        guard !Self.isCoreDataInaccessible else { return nil }
         let moc = context
         var result: T?
         moc.performAndWait {
@@ -208,6 +221,7 @@ extension SimpleCoreDataManageable {
         transformEntity: @escaping TransformEntity<T,U>,
         alterFetchRequest: @escaping AlterFetchRequest<T>
     ) -> U? {
+        guard !Self.isCoreDataInaccessible else { return nil }
         let moc = context
         var result: U?
         moc.performAndWait {
@@ -231,6 +245,7 @@ extension SimpleCoreDataManageable {
     public func getAll<T: NSManagedObject>(
         alterFetchRequest: @escaping AlterFetchRequest<T>
     ) -> [T] {
+        guard !Self.isCoreDataInaccessible else { return [] }
         let moc = context
         var result: [T] = []
         moc.performAndWait { // performAndWait does not require autoreleasepool
@@ -246,10 +261,14 @@ extension SimpleCoreDataManageable {
     }
     
     /// Retrieve multiple rows with criteria closure, and transform them to another data type.
+    ///
+    /// WARNING: Do not perform any core data action in transformEntity.
+    ///   Just retrieve your values and do stuff with them later, or it will deadlock!
     public func getAllTransformed<T: NSManagedObject, U>(
         transformEntity: @escaping TransformEntity<T,U>,
         alterFetchRequest: @escaping AlterFetchRequest<T>
     ) -> [U] {
+        guard !Self.isCoreDataInaccessible else { return [] }
         let moc = context
         var result: [U] = []
         moc.performAndWait { // performAndWait does not require autoreleasepool
@@ -269,6 +288,7 @@ extension SimpleCoreDataManageable {
     public func getCount<T: NSManagedObject>(
         alterFetchRequest: @escaping AlterFetchRequest<T>
     ) -> Int {
+        guard !Self.isCoreDataInaccessible else { return 0 }
         let moc = context
         var result = 0
         moc.performAndWait { // performAndWait does not require autoreleasepool
@@ -289,6 +309,7 @@ extension SimpleCoreDataManageable {
         sectionKey: String?,
         cacheName: String?
     ) -> NSFetchedResultsController<T>? {
+        guard !Self.isCoreDataInaccessible else { return nil }
         let moc = context
         guard let fetchRequest = T.fetchRequest() as? NSFetchRequest<T> else { return nil }
         alterFetchRequest(fetchRequest)
@@ -309,6 +330,7 @@ extension SimpleCoreDataManageable {
     public func createOne<T: NSManagedObject>(
         setInitialValues: @escaping SetAdditionalColumns<T>
     ) -> T? {
+        guard !Self.isCoreDataInaccessible else { return nil }
         let moc = context
         var result: T?
         let waitForEndTask = DispatchWorkItem() {} // semaphore flag
@@ -342,6 +364,7 @@ extension SimpleCoreDataManageable {
         item: T,
         setChangedValues: @escaping SetAdditionalColumns<T>
     ) -> Bool {
+        guard !Self.isCoreDataInaccessible else { return false }
         var result: Bool = false
         let waitForEndTask = DispatchWorkItem() {} // semaphore flag
         persistentContainer.performBackgroundTask { moc in
@@ -387,6 +410,7 @@ extension SimpleCoreDataManageable {
     public func deleteAll<T: NSManagedObject>(
         alterFetchRequest: @escaping AlterFetchRequest<T>
     ) -> Bool {
+        guard !Self.isCoreDataInaccessible else { return false }
         guard persistentContainer.persistentStoreDescriptions.first?.type != NSInMemoryStoreType else {
             return tediousManualDelete(alterFetchRequest: alterFetchRequest)
         }
