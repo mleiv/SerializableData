@@ -102,7 +102,8 @@ extension SimpleCoreDataManageable {
     
 //    // implement the following:
 //    public init(storeName: String?, context: NSManagedObjectContext?, isConfineToMemoryStore: Bool) {
-//        self.storeName = storeName ?? AppDelegate.coreDataStoreName
+//        self.isConfinedToMemoryStore = isConfineToMemoryStore
+//        self.storeName = storeName ?? CoreDataManager.defaultStoreName
 //        self.specificContext = context
 //        if let storeName = storeName {
 //            self.persistentContainer = NSPersistentContainer(name: storeName)
