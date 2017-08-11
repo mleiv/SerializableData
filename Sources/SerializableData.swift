@@ -141,7 +141,7 @@ public struct SerializableData {
     }
     
     public init(serializedString json: String) throws {
-        if let data = (json as NSString).data(using: String.Encoding.utf8.rawValue) {
+        if let data = json.data(using: .utf8) {
             try self.init(jsonData: data)
         } else {
             throw SerializableDataError.parsingError
@@ -442,7 +442,7 @@ extension SerializableData {
             default: urlStringValue += "\(self.urlEncode(prefixedKey))=&"
             }
         }
-        return urlStringValue.isEmpty ? "" : urlStringValue.substring(to: urlStringValue.index(before: urlStringValue.endIndex))
+        return urlStringValue.isEmpty ? "" : String(urlStringValue[..<urlStringValue.index(before: urlStringValue.endIndex)])
     }
     
     /// - Parameter list: an array to convert
@@ -460,7 +460,7 @@ extension SerializableData {
             default: urlStringValue += prefixHere + ","
             }
         }
-        return urlStringValue.isEmpty ? "" : urlStringValue.substring(to: urlStringValue.index(before: urlStringValue.endIndex))
+        return urlStringValue.isEmpty ? "" : String(urlStringValue[..<urlStringValue.index(before: urlStringValue.endIndex)])
     }
 
     /// - Parameter unescaped: The string to be escaped
@@ -522,11 +522,11 @@ extension SerializableData:  ExpressibleByDictionaryLiteral {
     }
 }
 extension SerializableData:  ExpressibleByArrayLiteral {
-    public typealias Element = SerializedDataStorable
-    public init(arrayLiteral elements: Element...) {
+    public typealias ArrayLiteralElement = SerializedDataStorable
+    public init(arrayLiteral elements: ArrayLiteralElement...) {
         contents = .arrayType(elements.map { $0.getData() })
     }
-    public init(arrayLiteral elements: Element?...) {
+    public init(arrayLiteral elements: ArrayLiteralElement?...) {
         contents = .arrayType(elements.map { $0?.getData() ?? SerializableData() })
     }
 }
@@ -586,7 +586,7 @@ extension SerializableData: CustomStringConvertible {
                 description += "\(key)=\(value.description),"
             }
             if !description.isEmpty {
-                return "[\(description.substring(to: description.index(before: description.endIndex)))]"
+                return "[\(String(description[..<description.index(before: description.endIndex)]))]"
             }
             return "[]"
         case .arrayType(let a):
@@ -595,7 +595,7 @@ extension SerializableData: CustomStringConvertible {
                 description += "\(value.description),"
             }
             if !description.isEmpty {
-                return "[\(description.substring(to: description.index(before: description.endIndex)))]"
+                return "[\(String(description[..<description.index(before: description.endIndex)]))]"
             }
             return "[]"
         default: return "nil"

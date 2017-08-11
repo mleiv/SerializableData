@@ -1,6 +1,6 @@
 # SerializableData
 
-**An easy Swift 3.0 library to get/set json-type data, usable in NSUserDefaults and CoreData**
+**An easy Swift 3.0+ library to get/set json-type data, usable in NSUserDefaults and CoreData**
 
 ## Including in Your App
 
@@ -11,6 +11,11 @@ There is no CocoaPods or Carthage installation option. If you want this, just co
 * SerializedDataRetrievable.swift
 * StringExtension.swift
 * DictionaryExtension.swift
+
+## News 2017-08-11
+### DEPRECATED IN SWIFT 4.0
+
+I have added a new branch for Swift 4.0. However, I strongly recommend eliminating this library and migrating to Swift's new [Codable protocol](https://developer.apple.com/documentation/foundation/archives_and_serialization/encoding_and_decoding_custom_types). I have only created this update so I can more easily manage the massive shift to Codable in my large MEGameTracker project.
 
 ## News 2016-09-17
 

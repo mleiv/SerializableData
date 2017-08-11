@@ -11,15 +11,35 @@ import XCTest
 
 class SerializableDataDemoTests: XCTestCase {
 
-    let sampleJson = "{\"persons\":[{\"id\": \"\(UUID())\", \"name\" : \"Phil Myman\", \"profession\" : \"R&D Lab Scientist\", \"organization\" : \"Veridian Dynamics\", \"notes\" : \"You know what you did.\", \"createdDate\" : \"2010-03-18 19:05:15\", \"modifiedDate\" : \"2010-01-26 20:00:09\"}, {\"id\": \"\(UUID())\", \"name\" : \"Veronica Palmer\", \"profession\" : \"Executive\", \"organization\" : \"Veridian Dynamics\", \"notes\" : \"Friendship. It's the same as stealing.\", \"createdDate\" : \"2010-03-18 19:00:07\", \"modifiedDate\" : \"2010-01-26 23:17:20\"}]}"
+    let sampleJson = """
+    {
+        "persons": [{
+            "id": "\(UUID())",
+            "name": "Phil Myman",
+            "profession": "R&D Lab Scientist",
+            "organization": "Veridian Dynamics",
+            "notes": "You know what you did.",
+            "createdDate": "2010-03-18 19:05:15",
+            "modifiedDate": "2010-01-26 20:00:09"
+        }, {
+            "id": "\(UUID())",
+            "name": "Veronica Palmer",
+            "profession": "Executive",
+            "organization": "Veridian Dynamics",
+            "notes": "Friendship. It's the same as stealing.",
+            "createdDate": "2010-03-18 19:00:07",
+            "modifiedDate": "2010-01-26 23:17:20"
+        }]
+    }
+    """
     let oneDay = TimeInterval(24 * 60 * 60)
-    var sevenYearsAgo = Date()
+    var tenYearsAgo = Date()
     var fiveYearsAgo = Date()
     
     override func setUp() {
         super.setUp()
         SimpleCoreDataManager.current = getSandboxedManager()
-        sevenYearsAgo = Date(timeIntervalSinceNow: (-self.oneDay) * 365 * 7)
+        tenYearsAgo = Date(timeIntervalSinceNow: (-self.oneDay) * 365 * 10)
         fiveYearsAgo = Date(timeIntervalSinceNow: (-self.oneDay) * 365 * 5)
     }
     
@@ -32,13 +52,13 @@ class SerializableDataDemoTests: XCTestCase {
     }
     
     func testNsData() {
-        if let jsonData = (sampleJson as NSString).data(using: String.Encoding.utf8.rawValue) {
+        if let jsonData = sampleJson.data(using: .utf8) {
             if let serializableData = try? SerializableData(jsonData: jsonData) {
                 if let personsList = serializableData["persons"]?.array {
                     XCTAssert(personsList[0]["name"]?.string == "Phil Myman", "Lost Phil's name")
                     XCTAssert(personsList[1]["name"]?.string == "Veronica Palmer", "Lost Veronica's name")
                     let philsStartDate = personsList[0]["createdDate"]?.date ?? Date()
-                    XCTAssert(philsStartDate.compare(sevenYearsAgo) == .orderedDescending && philsStartDate.compare(fiveYearsAgo) == .orderedAscending, "Misread Phil's start date")
+                    XCTAssert(philsStartDate.compare(tenYearsAgo) == .orderedDescending && philsStartDate.compare(fiveYearsAgo) == .orderedAscending, "Misread Phil's start date")
                 } else {
                     XCTAssert(false, "Failed to recover array")
                 }
@@ -57,7 +77,7 @@ class SerializableDataDemoTests: XCTestCase {
                 XCTAssert(personsList[0]["name"]?.string == "Phil Myman", "Lost Phil's name")
                 XCTAssert(personsList[1]["name"]?.string == "Veronica Palmer", "Lost Veronica's name")
                 let philsStartDate = personsList[0]["createdDate"]?.date ?? Date()
-                    XCTAssert(philsStartDate.compare(sevenYearsAgo) == .orderedDescending && philsStartDate.compare(fiveYearsAgo) == .orderedAscending, "Misread Phil's start date")
+                    XCTAssert(philsStartDate.compare(tenYearsAgo) == .orderedDescending && philsStartDate.compare(fiveYearsAgo) == .orderedAscending, "Misread Phil's start date")
             } else {
                 XCTAssert(false, "Failed to recover array")
             }
@@ -76,7 +96,7 @@ class SerializableDataDemoTests: XCTestCase {
                     XCTAssert(personsList[0]["name"]?.string == "Phil Myman", "Lost Phil's name")
                     XCTAssert(personsList[1]["name"]?.string == "Veronica Palmer", "Lost Veronica's name")
                     let philsStartDate = personsList[0]["createdDate"]?.date ?? Date()
-                    XCTAssert(philsStartDate.compare(sevenYearsAgo) == .orderedDescending && philsStartDate.compare(fiveYearsAgo) == .orderedAscending, "Misread Phil's start date")
+                    XCTAssert(philsStartDate.compare(tenYearsAgo) == .orderedDescending && philsStartDate.compare(fiveYearsAgo) == .orderedAscending, "Misread Phil's start date")
                 } else {
                     XCTAssert(false, "Failed to recover array")
                 }
@@ -100,7 +120,7 @@ class SerializableDataDemoTests: XCTestCase {
         serializableData["bool1"] = true
         XCTAssert(serializableData["bool1"]?.bool == true, "Did not correctly set Bool value")
         serializableData["date1"] = SerializableData.safeInit(date: fiveYearsAgo) // dates are tricky
-        print("\(serializableData["date1"]?.date) \(fiveYearsAgo)")
+        print("\(String(describing: serializableData["date1"]?.date)) \(fiveYearsAgo)")
         XCTAssert(stringFromDate(serializableData["date1"]?.date ?? Date()) == stringFromDate(fiveYearsAgo), "Did not correctly set Date value")
         // it is also hard to compare dates - they report the same up to second, but still don't ==
         serializableData["array1"] = [1, 5]

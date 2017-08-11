@@ -33,8 +33,8 @@ struct MoveStore20170211 {
         let fileManager = FileManager.default
         guard fileManager.fileExists(atPath: oldStoreUrl.path) && !fileManager.fileExists(atPath: newStoreUrl.path) else { return }
         if let storeDirectory = Bundle.main.url(forResource: newStoreName, withExtension: "momd")?.lastPathComponent,
-            let modelURL = Bundle.main.url(forResource: "SerializableDataDemo", withExtension: "mom", subdirectory: storeDirectory),
-            let managedObjectModel = NSManagedObjectModel(contentsOf: modelURL) {
+            let modelURL = Bundle.main.url(forResource: "SerializableDataDemo", withExtension: "mom", subdirectory: storeDirectory) {
+            let managedObjectModel = NSManagedObjectModel(contentsOf: modelURL)
             let persistentStoreCoordinator = NSPersistentStoreCoordinator(managedObjectModel: managedObjectModel)
             // create new folder, if needed
             let newStorePath = newStoreUrl.deletingLastPathComponent()
