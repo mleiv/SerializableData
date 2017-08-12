@@ -9,7 +9,10 @@
 
 import UIKit
 
-public enum SerializableDataError : Error {
+// swiftlint:disable file_length
+// TODO: Split out?
+
+public enum SerializableDataError: Error {
     case parsingError
     case fileLoadError
     case typeMismatch
@@ -24,13 +27,13 @@ public enum SerializableDataError : Error {
         print(x["something"]?.double) //Optional(3.05)
 */
 public struct SerializableData {
-    
+
     internal enum StorageType {
         case none
         case valueType(SerializedDataStorable)
         indirect case dictionaryType([String: SerializableData])
         indirect case arrayType([SerializableData])
-        
+
         internal func isNone() -> Bool {
             if case .none = self { return true } else { return false }
         }
@@ -45,48 +48,48 @@ public struct SerializableData {
         }
     }
     internal var contents = StorageType.none
-    
-    //MARK: Initializers
-    
+
+    // MARK: Initializers
+
     public init() {}
-    
+
     public init<T>(_ data: T) throws {
         switch data {
-            case let v as [SerializableData]:
-                contents = .arrayType(v)
-            case let v as [SerializedDataStorable?]: 
-                var a: [SerializableData] = []
-                for (value) in v { a.append( value?.getData() ?? SerializableData() ) }
-                contents = .arrayType(a)
-            case let v as [AnyObject]:
-                var a: [SerializableData] = []
-                for (value) in v { a.append( try SerializableData(value) ) }
-                contents = .arrayType(a)
-            case let v as [String: SerializableData]:
-                contents = .dictionaryType(v)
-            case let v as [String: SerializedDataStorable?]: 
-                var a: [String: SerializableData] = [:]
-                for (key, value) in v { a[key] = value?.getData() ?? SerializableData()  }
-                contents = .dictionaryType(a)
-            case let v as [String: AnyObject]:
-                var a: [String: SerializableData] = [:]
-                for (key, value) in v { a[key] = try SerializableData(value) }
-                contents = .dictionaryType(a)
-            case let v as SerializedDataStorable:
-                if v is SerializedDataStorableFlatValue {
-                    contents = .valueType(v)
+            case let dataArray as [SerializableData]:
+                contents = .arrayType(dataArray)
+            case let dataArray as [SerializedDataStorable?]:
+                var list: [SerializableData] = []
+                for (value) in dataArray { list.append( value?.getData() ?? SerializableData() ) }
+                contents = .arrayType(list)
+            case let dataArray as [AnyObject]:
+                var list: [SerializableData] = []
+                for (value) in dataArray { list.append( try SerializableData(value) ) }
+                contents = .arrayType(list)
+            case let dataDictionary as [String: SerializableData]:
+                contents = .dictionaryType(dataDictionary)
+            case let dataDictionary as [String: SerializedDataStorable?]:
+                var list: [String: SerializableData] = [:]
+                for (key, value) in dataDictionary { list[key] = value?.getData() ?? SerializableData()  }
+                contents = .dictionaryType(list)
+            case let dataDictionary as [String: AnyObject]:
+                var list: [String: SerializableData] = [:]
+                for (key, value) in dataDictionary { list[key] = try SerializableData(value) }
+                contents = .dictionaryType(list)
+            case let dataValue as SerializedDataStorable:
+                if dataValue is SerializedDataStorableFlatValue {
+                    contents = .valueType(dataValue)
                 } else {
-                    self = v.getData()
+                    self = dataValue.getData()
                 }
             case nil: break
             default: throw SerializableDataError.parsingError
         }
     }
-    
+
     public static func safeInit<T>(_ data: T) -> SerializableData {
         return (try? SerializableData(data)) ?? SerializableData()
     }
-    
+
     /// - Parameter date: does date to string conversion before storing value
     public init(date: Date) throws {
        if let sDate = stringFromDate(date) {
@@ -95,17 +98,17 @@ public struct SerializableData {
             throw SerializableDataError.parsingError
         }
     }
-    
+
     public static func safeInit(date: Date) -> SerializableData {
        return (try? SerializableData(date: date)) ?? SerializableData()
     }
-    
+
     /// - Parameter data: does date to string conversion before storing value
     public init(data: Data) {
         let sData = data.base64EncodedString()
         contents = .valueType(sData)
     }
-    
+
     /// Note: You probably want to run this on a background thread for large data
     /// - Parameter fileName: a file inside documents folder, presumably of json format
     public init(fileName: String) throws {
@@ -120,26 +123,30 @@ public struct SerializableData {
     }
 
     /// Note: You probably want to run this on a background thread for large data
-    /// - Parameter jsonData: parses a json list of Data format. Throws error if it can't parse it/make it SerializableData.
+    /// - Parameter jsonData: parses a json list of Data format.
+    ///      Throws error if it can't parse it/make it SerializableData.
     public init(jsonData: Data) throws {
         try self.init(serializedData: jsonData)
     }
-    
+
     public init(serializedData data: Data) throws {
         do {
-            let d = try JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions.allowFragments)
-            try self.init(d)
+            let jsonData = try JSONSerialization.jsonObject(with: data,
+                                                            options: JSONSerialization.ReadingOptions.allowFragments)
+            try self.init(jsonData)
         } catch {
+            print("JSONSerialization error: \(error)")
             throw SerializableDataError.parsingError
         }
     }
-    
+
     /// Note: You probably want to run this on a background thread for large data
-    /// - Parameter jsonString: parses a json-formatted string. Throws error if it can't parse it/make it SerializableData.
+    /// - Parameter jsonString: parses a json-formatted string.
+    ///      Throws error if it can't parse it/make it SerializableData.
     public init(jsonString: String) throws {
         try self.init(serializedString: jsonString)
     }
-    
+
     public init(serializedString json: String) throws {
         if let data = json.data(using: .utf8) {
             try self.init(jsonData: data)
@@ -149,62 +156,57 @@ public struct SerializableData {
     }
 }
 
-
 extension SerializableData {
-//MARK: Return stored data
-    
+// MARK: Return stored data
+
     /// - Returns: Whatever type requested, if it is possible to convert the data into that format.
     public func value<T>() -> T? {
         let formatter = NumberFormatter()
         switch contents {
         case .none: return nil
-        case .valueType(let v):
-//            if let tValue = v as? T {
-//                return tValue
-//            }
-            let s = String(describing: v)
-            if s == "<null>" {
-                return nil
-            }
+        case .valueType(let value):
+            let stringValue = String(describing: value)
+            if stringValue == "<null>" { return nil }
             // fun times: json is often ambiguous about whether it's a string or a number
-            if Bool.self == T.self, let tValue = NSString(string: s).boolValue as? T {
+            if Bool.self == T.self, let tValue = NSString(string: stringValue).boolValue as? T {
                 return tValue
-            } else if Int.self == T.self, let tValue = formatter.number(from: s)?.intValue as? T {
+            } else if Int.self == T.self,
+                let tValue = formatter.number(from: stringValue)?.intValue as? T {
                 return tValue
-            } else if Float.self == T.self, let tValue = formatter.number(from: s)?.floatValue as? T {
+            } else if Float.self == T.self,
+                let tValue = formatter.number(from: stringValue)?.floatValue as? T {
                 return tValue
-            } else if Double.self == T.self, let tValue = formatter.number(from: s)?.doubleValue as? T {
+            } else if Double.self == T.self,
+                let tValue = formatter.number(from: stringValue)?.doubleValue as? T {
                 return tValue
-            } else if CGFloat.self == T.self, let v = formatter.number(from: s)?.doubleValue,
-                      let tValue = CGFloat(v) as? T {
+            } else if CGFloat.self == T.self,
+                let doubleValue = formatter.number(from: stringValue)?.doubleValue,
+                let tValue = CGFloat(doubleValue) as? T {
                 return tValue
-            } else if Date.self == T.self, let tValue = dateFromString(s) as? T {
+            } else if Date.self == T.self, let tValue = dateFromString(stringValue) as? T {
                 return tValue
-            } else if URL.self == T.self, let tValue = URL(string: s) as? T {
+            } else if URL.self == T.self, let tValue = URL(string: stringValue) as? T {
                 return tValue
-            } else if Data.self == T.self, let tValue = Data(base64Encoded: s, options: .ignoreUnknownCharacters) as? T {
+            } else if Data.self == T.self,
+                let tValue = Data(base64Encoded: stringValue, options: .ignoreUnknownCharacters) as? T {
                 return tValue
-            } else if let tValue = formatter.number(from: s) as? T { //NSNumber
+            } else if let tValue = formatter.number(from: stringValue) as? T { //NSNumber
                 return tValue
-            } else if let tValue = s as? T { // string requested
+            } else if let tValue = stringValue as? T { // string requested
                 return tValue
             }
-            return nil
-        case .dictionaryType(let d):
-            if let tValue = d as? T {
+        case .dictionaryType(let list):
+            if let tValue = list as? T {
                 return tValue
-            } else {
-                return nil
             }
-        case .arrayType(let a):
-            if let tValue = a as? T {
+        case .arrayType(let list):
+            if let tValue = list as? T {
                 return tValue
-            } else {
-                return nil
             }
         }
+        return nil
     }
-    
+
     /// - Returns: Optional(String) if this object can be one (most things can)
     public var string: String? { return value() as String? }
     /// - Returns: Optional(Bool) if this object can be converted to one
@@ -227,7 +229,7 @@ extension SerializableData {
     public var data: Data? { return value() as Data? }
     /// - Returns: Optional(NSDate) if this object can be converted to one
     public var isNil: Bool { return contents == StorageType.none }
-    
+
     /// - Parameter value: A date string of format "YYYY-MM-dd HH:mm:ss"
     /// - Returns: Optional(NSDate)
     func dateFromString(_ value: String) -> Date? {
@@ -239,7 +241,7 @@ extension SerializableData {
         let date = dateFormatter.date(from: value)
         return date
     }
-    
+
     /// - Parameter value: NSDate
     /// - Returns: Optional(String) of format "YYYY-MM-dd HH:mm:ss"
     func stringFromDate(_ value: Date) -> String? {
@@ -252,13 +254,14 @@ extension SerializableData {
     }
 }
 
-
 extension SerializableData {
-//MARK: subscript and array access
-    
-    // SerializableData does not implement full sequence/collection type because you should be using .array and .dictionary instead (trust me, you will find it is far easier when dealing with mixed data-!).
+// MARK: subscript and array access
+
+    // SerializableData does not implement full sequence/collection type
+    //    because you should be using .array and .dictionary instead
+    //    (trust me, you will find it is far easier when dealing with mixed data-!).
     // But I've included append and subscript just to make editing your data a little bit easier.
-    
+
     public subscript(index: String) -> SerializableData? {
         get {
             if case .dictionaryType(let d) = contents {
@@ -299,37 +302,38 @@ extension SerializableData {
             }
         }
     }
-    
-    /// - Parameter value: Any value type. If value cannot be converted to SerializableData, or if this SerializableData object is not an array, then it throws error. (If this object is .None, then it changes to an array of the new value.)
+
+    /// - Parameter value: Any value type. If value cannot be converted to SerializableData,
+    ///    or if this SerializableData object is not an array, then it throws error.
+    ///    (If this object is .None, then it changes to an array of the new value.)
     public mutating func append<T>(_ value: T?) throws {
-        guard case .arrayType(var a) = contents else {
+        guard case .arrayType(var list) = contents else {
             throw SerializableDataError.typeMismatch
         }
-        a.append([ try SerializableData(value) ])
-        contents = .arrayType(a)
+        list.append([ try SerializableData(value) ])
+        contents = .arrayType(list)
     }
-    
+
     /// - Returns: A dictionary if this object is one
     public var dictionary: [String: SerializableData]? {
-        if case .dictionaryType(let d) = contents {
-            return d
+        if case .dictionaryType(let list) = contents {
+            return list
         }
         return nil
     }
-    
+
     /// - Returns: An array if this object is one
     public var array: [SerializableData]? {
-        if case .arrayType(let a) = contents {
-            return a
+        if case .arrayType(let list) = contents {
+            return list
         }
         return nil
     }
 }
 
-
 extension SerializableData {
-//MARK: formatting data for other uses
-    
+// MARK: formatting data for other uses
+
     /// Note: You probably want to run this on a background thread for large data
     /// - Parameter fileName: writes file of this name to documents folder; can be retrieved via init(file:)
     /// - Returns: true if write was a success
@@ -347,7 +351,7 @@ extension SerializableData {
         }
         return false
     }
-    
+
     /// - Parameter fileName: deletes file of this name from documents folder
     /// - Returns: true if delete was a success
     public func delete(fileName: String) -> Bool {
@@ -356,12 +360,12 @@ extension SerializableData {
             return false
         }
         let path = (documents as NSString).appendingPathComponent(fileName)
-        if let _ = try? FileManager.default.removeItem(atPath: path) , !FileManager.default.fileExists(atPath: path) {
+        if let _ = try? FileManager.default.removeItem(atPath: path), !FileManager.default.fileExists(atPath: path) {
             return true
         }
         return false
     }
-    
+
     /// - Returns: AnyObject (closest to the format used to create the SerializableData object originally)
     public var anyObject: AnyObject {
         switch contents {
@@ -394,14 +398,15 @@ extension SerializableData {
             return nil
         }
         do {
-            return try JSONSerialization.data(withJSONObject: anyObject, options: JSONSerialization.WritingOptions.prettyPrinted)
+            return try JSONSerialization.data(withJSONObject: anyObject,
+                                              options: JSONSerialization.WritingOptions.prettyPrinted)
         } catch {
             return nil
         }
     }
-    
-    //MARK: jsonString
-    
+
+    // MARK: jsonString
+
     /// - Returns: A flattened json string
     public var jsonString: String {
         switch contents {
@@ -416,8 +421,8 @@ extension SerializableData {
         }
     }
 
-    //MARK: urlString
-    
+    // MARK: urlString
+
     /// - Returns: A flattened String in format "key=value&key=value"
     public var urlString: String {
         switch contents {
@@ -427,7 +432,7 @@ extension SerializableData {
         default: return ""
         }
     }
-    
+
     /// - Parameter list: a dictionary to convert
     /// - Parameter prefix: - an optional prefix to use before the key (necessary for nested data)
     /// - Returns: A flattened String in format "key=value&key=value"
@@ -442,9 +447,11 @@ extension SerializableData {
             default: urlStringValue += "\(self.urlEncode(prefixedKey))=&"
             }
         }
-        return urlStringValue.isEmpty ? "" : String(urlStringValue[..<urlStringValue.index(before: urlStringValue.endIndex)])
+        return urlStringValue.isEmpty
+            ? ""
+            : String(urlStringValue[..<urlStringValue.index(before: urlStringValue.endIndex)])
     }
-    
+
     /// - Parameter list: an array to convert
     /// - Parameter prefix: - an optional prefix to use before the key (necessary for nested data)
     /// - Returns: A flattened String in format "key=value&key=value"
@@ -460,7 +467,9 @@ extension SerializableData {
             default: urlStringValue += prefixHere + ","
             }
         }
-        return urlStringValue.isEmpty ? "" : String(urlStringValue[..<urlStringValue.index(before: urlStringValue.endIndex)])
+        return urlStringValue.isEmpty
+            ? ""
+            : String(urlStringValue[..<urlStringValue.index(before: urlStringValue.endIndex)])
     }
 
     /// - Parameter unescaped: The string to be escaped
@@ -468,45 +477,52 @@ extension SerializableData {
     public static func urlEncode(_ unescaped: SerializedDataStorable) -> String {
         let characterSet = NSMutableCharacterSet.alphanumeric()
         characterSet.addCharacters(in: "-._~")
-        if !(unescaped is NSNull), let escaped = "\(unescaped)".addingPercentEncoding(withAllowedCharacters: characterSet as CharacterSet) {
+        if !(unescaped is NSNull),
+            let escaped = "\(unescaped)"
+                .addingPercentEncoding(withAllowedCharacters: characterSet as CharacterSet) {
             return escaped
         }
         return ""
     }
 }
 
-//MARK: LiteralConvertible Protocols
+// MARK: LiteralConvertible Protocols
 
 extension SerializableData: ExpressibleByNilLiteral {
     public init(nilLiteral: ()) {
     }
 }
+
 extension SerializableData: ExpressibleByStringLiteral {
-    public init(stringLiteral s: StringLiteralType) {
-        contents = .valueType(s)
+    public init(stringLiteral string: StringLiteralType) {
+        contents = .valueType(string)
     }
-    public init(extendedGraphemeClusterLiteral s: StringLiteralType) {
-        contents = .valueType(s)
+    public init(extendedGraphemeClusterLiteral string: StringLiteralType) {
+        contents = .valueType(string)
     }
-    public init(unicodeScalarLiteral s: StringLiteralType) {
-        contents = .valueType(s)
+    public init(unicodeScalarLiteral string: StringLiteralType) {
+        contents = .valueType(string)
     }
 }
+
 extension SerializableData: ExpressibleByIntegerLiteral {
-    public init(integerLiteral i: IntegerLiteralType) {
-        contents = .valueType(i)
+    public init(integerLiteral integer: IntegerLiteralType) {
+        contents = .valueType(integer)
     }
 }
+
 extension SerializableData: ExpressibleByFloatLiteral {
-    public init(floatLiteral f: FloatLiteralType) {
-        contents = .valueType(f)
+    public init(floatLiteral float: FloatLiteralType) {
+        contents = .valueType(float)
     }
 }
+
 extension SerializableData: ExpressibleByBooleanLiteral {
-    public init(booleanLiteral b: BooleanLiteralType) {
-        contents = .valueType(b)
+    public init(booleanLiteral boolean: BooleanLiteralType) {
+        contents = .valueType(boolean)
     }
 }
+
 extension SerializableData:  ExpressibleByDictionaryLiteral {
     public typealias Key = String
     public typealias Value = SerializedDataStorable
@@ -521,6 +537,7 @@ extension SerializableData:  ExpressibleByDictionaryLiteral {
         contents = .dictionaryType(d)
     }
 }
+
 extension SerializableData:  ExpressibleByArrayLiteral {
     public typealias ArrayLiteralElement = SerializedDataStorable
     public init(arrayLiteral elements: ArrayLiteralElement...) {
@@ -531,20 +548,20 @@ extension SerializableData:  ExpressibleByArrayLiteral {
     }
 }
 
+// MARK: - Equatable Protocol
 
 extension SerializableData: Equatable {}
-//MARK: - Equatable Protocol
 
-public func ==(lhs: SerializableData, rhs: SerializableData) -> Bool {
+public func == (lhs: SerializableData, rhs: SerializableData) -> Bool {
     return lhs.contents == rhs.contents
 }
-public func ==(lhs: SerializableData?, rhs: SerializableData?) -> Bool {
+public func == (lhs: SerializableData?, rhs: SerializableData?) -> Bool {
     return lhs?.contents ?? .none == rhs?.contents ?? .none
 }
-public func ==(lhs: SerializableData, rhs: SerializableData?) -> Bool {
+public func == (lhs: SerializableData, rhs: SerializableData?) -> Bool {
     return lhs.contents == rhs?.contents ?? .none
 }
-public func ==(lhs: SerializableData?, rhs: SerializableData) -> Bool {
+public func == (lhs: SerializableData?, rhs: SerializableData) -> Bool {
     return lhs?.contents ?? .none == rhs.contents
 }
 
@@ -566,16 +583,17 @@ func == (lhs: SerializableData.StorageType, rhs: SerializableData.StorageType) -
 }
 
 //extension SerializedDataStorable: Equatable {}
-// we can't declare SerializedDataStorable Equatable or ArrayLiteralConvertible and DictionaryLiteralConvertible break, also would have to be declared on SerializedDataStorable initial definition
-// also, since SerializableData is SerializedDataStorable, there is infinite looping. :(
-//public func ==(lhs: SerializedDataStorable?, rhs: SerializedDataStorable?) -> Bool {
+
+// we can't declare SerializedDataStorable Equatable or ArrayLiteralConvertible and DictionaryLiteralConvertible break,
+//   also would have to be declared on SerializedDataStorable initial definition
+//   also, since SerializableData is SerializedDataStorable, there is infinite looping. :(
+//public func == (lhs: SerializedDataStorable?, rhs: SerializedDataStorable?) -> Bool {
 //    print("X")
 //    return (lhs?.getData() ?? nil) == (rhs?.getData() ?? nil)
 //}
 
-
+// MARK: - CustomStringConvertible Protocol
 extension SerializableData: CustomStringConvertible {
-//MARK: - CustomStringConvertible Protocol
 
     public var description: String {
         switch contents {

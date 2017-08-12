@@ -10,10 +10,12 @@
 
 import UIKit
 
-//MARK: SerializedDataStorable Protocol
+// MARK: SerializedDataStorable Protocol
 // (can be extended to any type you want, just implement getData)
 
-public protocol SerializedDataStorable { // any struct or object can be stored in SerializableData, provided it adheres to this
+public protocol SerializedDataStorable {
+    // any struct or object can be stored in SerializableData, provided it adheres to this protocol
+
     func getData() -> SerializableData // implement this
     var serializedString: String { get } // implemented by protocol
 }
@@ -22,7 +24,7 @@ public protocol SerializedDataStorable { // any struct or object can be stored i
 
 extension SerializedDataStorable {
     public var serializedString: String {
-        get { return getData().jsonString }
+        return getData().jsonString
     }
     public func getData() -> SerializableData { // default implementation
         if let data = self as? SerializableData {
@@ -70,8 +72,8 @@ extension SerializableData: SerializedDataStorable {
     public func getData() -> SerializableData { return self }
 }
 
-
-// You cannot declare Array/Dictionary -both- SerializedDataStorable and containing SerializedDataStorable type (it's one or the other)
+// You cannot declare Array/Dictionary -both- SerializedDataStorable
+// and containing SerializedDataStorable type (it's one or the other)
 //extension Sequence where Iterator.Element == (T: String, U: SerializedDataStorable?) {
 //    func getData() -> SerializableData {
 //        return SerializableData( Dictionary( map { ($0.0, SerializableData($0.1) ) } ) )

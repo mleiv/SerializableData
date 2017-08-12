@@ -42,9 +42,9 @@ extension SerializedDataRetrievable {
 
 extension SerializedDataRetrievable where Self: SerializedDataStorable {
     public var serializedString: String {
-        get { return getData().jsonString }
+        return getData().jsonString
     }
     public var serializedData: Data? {
-        get { return getData().toData() as Data? }
+        return getData().toData() as Data?
     }
 }
