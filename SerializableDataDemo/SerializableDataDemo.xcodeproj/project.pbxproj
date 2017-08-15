@@ -18,16 +18,15 @@
 		B04F6D371BD1CB7900790FB3 /* UserDefaultsPersonController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B04F6D321BD1CB7900790FB3 /* UserDefaultsPersonController.swift */; };
 		B04F6D381BD1CB7900790FB3 /* UserDefaultsPersonsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B04F6D331BD1CB7900790FB3 /* UserDefaultsPersonsController.swift */; };
 		B04F6D4C1BD1CB9800790FB3 /* CoreDataPerson.swift in Sources */ = {isa = PBXBuildFile; fileRef = B04F6D3C1BD1CB9800790FB3 /* CoreDataPerson.swift */; };
-		B04F6D4D1BD1CB9800790FB3 /* SimpleSerializedCoreDataStorable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B04F6D3D1BD1CB9800790FB3 /* SimpleSerializedCoreDataStorable.swift */; };
-		B04F6D511BD1CB9800790FB3 /* SerializableData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B04F6D441BD1CB9800790FB3 /* SerializableData.swift */; };
-		B04F6D521BD1CB9800790FB3 /* SerializedDataRetrievable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B04F6D451BD1CB9800790FB3 /* SerializedDataRetrievable.swift */; };
-		B04F6D531BD1CB9800790FB3 /* SerializedDataStorable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B04F6D461BD1CB9800790FB3 /* SerializedDataStorable.swift */; };
 		B04F6D541BD1CB9800790FB3 /* UserDefaultsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B04F6D481BD1CB9800790FB3 /* UserDefaultsManager.swift */; };
 		B04F6D551BD1CB9800790FB3 /* UserDefaultsPerson.swift in Sources */ = {isa = PBXBuildFile; fileRef = B04F6D491BD1CB9800790FB3 /* UserDefaultsPerson.swift */; };
 		B04F6D561BD1CB9800790FB3 /* UserDefaultsStorable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B04F6D4A1BD1CB9800790FB3 /* UserDefaultsStorable.swift */; };
-		B11911181E5784A500BF7E06 /* SimpleSerializedCoreDataManageable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B11911171E5784A500BF7E06 /* SimpleSerializedCoreDataManageable.swift */; };
 		B12E98C51E56487000F0A577 /* CoreDataStructuralMigrations.swift in Sources */ = {isa = PBXBuildFile; fileRef = B12E98C41E56487000F0A577 /* CoreDataStructuralMigrations.swift */; };
 		B12E98C71E56494E00F0A577 /* MoveStore20170211.swift in Sources */ = {isa = PBXBuildFile; fileRef = B12E98C61E56494E00F0A577 /* MoveStore20170211.swift */; };
+		B130596F1F43815A00863AD7 /* CodableCoreDataManageable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B130596E1F43815A00863AD7 /* CodableCoreDataManageable.swift */; };
+		B13059711F43816600863AD7 /* CodableCoreDataStorable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B13059701F43816600863AD7 /* CodableCoreDataStorable.swift */; };
+		B13059731F43817600863AD7 /* GenericDecodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B13059721F43817600863AD7 /* GenericDecodable.swift */; };
+		B1AD38C01F4381F500CC22A8 /* JsonCoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1AD38BF1F4381F500CC22A8 /* JsonCoder.swift */; };
 		B1C67CB71E4C56BA0035B138 /* Migration3.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C67CB61E4C56BA0035B138 /* Migration3.swift */; };
 		B1CC5D051E5AAC9E007E0589 /* SimpleCoreDataManageable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1CC5D031E5AAC9E007E0589 /* SimpleCoreDataManageable.swift */; };
 		B1CC5D081E5AACB4007E0589 /* SimpleCoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1CC5D071E5AACB4007E0589 /* SimpleCoreDataManager.swift */; };
@@ -65,16 +64,15 @@
 		B04F6D321BD1CB7900790FB3 /* UserDefaultsPersonController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserDefaultsPersonController.swift; sourceTree = "<group>"; };
 		B04F6D331BD1CB7900790FB3 /* UserDefaultsPersonsController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserDefaultsPersonsController.swift; sourceTree = "<group>"; };
 		B04F6D3C1BD1CB9800790FB3 /* CoreDataPerson.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataPerson.swift; sourceTree = "<group>"; };
-		B04F6D3D1BD1CB9800790FB3 /* SimpleSerializedCoreDataStorable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SimpleSerializedCoreDataStorable.swift; sourceTree = "<group>"; };
-		B04F6D441BD1CB9800790FB3 /* SerializableData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SerializableData.swift; sourceTree = "<group>"; };
-		B04F6D451BD1CB9800790FB3 /* SerializedDataRetrievable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SerializedDataRetrievable.swift; sourceTree = "<group>"; };
-		B04F6D461BD1CB9800790FB3 /* SerializedDataStorable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SerializedDataStorable.swift; sourceTree = "<group>"; };
 		B04F6D481BD1CB9800790FB3 /* UserDefaultsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserDefaultsManager.swift; sourceTree = "<group>"; };
 		B04F6D491BD1CB9800790FB3 /* UserDefaultsPerson.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserDefaultsPerson.swift; sourceTree = "<group>"; };
 		B04F6D4A1BD1CB9800790FB3 /* UserDefaultsStorable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserDefaultsStorable.swift; sourceTree = "<group>"; };
-		B11911171E5784A500BF7E06 /* SimpleSerializedCoreDataManageable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SimpleSerializedCoreDataManageable.swift; sourceTree = "<group>"; };
 		B12E98C41E56487000F0A577 /* CoreDataStructuralMigrations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataStructuralMigrations.swift; sourceTree = "<group>"; };
 		B12E98C61E56494E00F0A577 /* MoveStore20170211.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MoveStore20170211.swift; sourceTree = "<group>"; };
+		B130596E1F43815A00863AD7 /* CodableCoreDataManageable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodableCoreDataManageable.swift; sourceTree = "<group>"; };
+		B13059701F43816600863AD7 /* CodableCoreDataStorable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodableCoreDataStorable.swift; sourceTree = "<group>"; };
+		B13059721F43817600863AD7 /* GenericDecodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericDecodable.swift; sourceTree = "<group>"; };
+		B1AD38BF1F4381F500CC22A8 /* JsonCoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JsonCoder.swift; sourceTree = "<group>"; };
 		B1C67CB61E4C56BA0035B138 /* Migration3.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Migration3.swift; sourceTree = "<group>"; };
 		B1CC5D031E5AAC9E007E0589 /* SimpleCoreDataManageable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SimpleCoreDataManageable.swift; sourceTree = "<group>"; };
 		B1CC5D071E5AACB4007E0589 /* SimpleCoreDataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SimpleCoreDataManager.swift; sourceTree = "<group>"; };
@@ -129,8 +127,8 @@
 		B04F6D0B1BD1CAFA00790FB3 /* SerializableDataDemo */ = {
 			isa = PBXGroup;
 			children = (
+				B1081B6B1F43808B00523BF7 /* Library */,
 				B04F6D0C1BD1CAFA00790FB3 /* AppDelegate.swift */,
-				B04F6D431BD1CB9800790FB3 /* SerializableData */,
 				B04F6D3A1BD1CB9800790FB3 /* Core Data */,
 				B04F6D471BD1CB9800790FB3 /* User Defaults */,
 				B04F6D101BD1CAFA00790FB3 /* Main.storyboard */,
@@ -170,32 +168,46 @@
 				B04F6D3C1BD1CB9800790FB3 /* CoreDataPerson.swift */,
 				B1CC5D271E5BA936007E0589 /* SerializableDataDemo.xcdatamodeld */,
 				B1CC5D071E5AACB4007E0589 /* SimpleCoreDataManager.swift */,
-				B1CC5D031E5AAC9E007E0589 /* SimpleCoreDataManageable.swift */,
-				B11911171E5784A500BF7E06 /* SimpleSerializedCoreDataManageable.swift */,
-				B04F6D3D1BD1CB9800790FB3 /* SimpleSerializedCoreDataStorable.swift */,
 				B1C67CB51E4C56BA0035B138 /* Migrations */,
+				B1AD38BF1F4381F500CC22A8 /* JsonCoder.swift */,
 			);
 			path = "Core Data";
-			sourceTree = "<group>";
-		};
-		B04F6D431BD1CB9800790FB3 /* SerializableData */ = {
-			isa = PBXGroup;
-			children = (
-				B04F6D441BD1CB9800790FB3 /* SerializableData.swift */,
-				B04F6D451BD1CB9800790FB3 /* SerializedDataRetrievable.swift */,
-				B04F6D461BD1CB9800790FB3 /* SerializedDataStorable.swift */,
-			);
-			path = SerializableData;
 			sourceTree = "<group>";
 		};
 		B04F6D471BD1CB9800790FB3 /* User Defaults */ = {
 			isa = PBXGroup;
 			children = (
-				B04F6D481BD1CB9800790FB3 /* UserDefaultsManager.swift */,
-				B04F6D4A1BD1CB9800790FB3 /* UserDefaultsStorable.swift */,
 				B04F6D491BD1CB9800790FB3 /* UserDefaultsPerson.swift */,
 			);
 			path = "User Defaults";
+			sourceTree = "<group>";
+		};
+		B1081B6B1F43808B00523BF7 /* Library */ = {
+			isa = PBXGroup;
+			children = (
+				B130596A1F43812900863AD7 /* CodableCoreData */,
+				B1081B6C1F43809C00523BF7 /* SimpleCoreData */,
+				B1E1968B1F43AFD700991A2C /* UserDefaults */,
+			);
+			path = Library;
+			sourceTree = "<group>";
+		};
+		B1081B6C1F43809C00523BF7 /* SimpleCoreData */ = {
+			isa = PBXGroup;
+			children = (
+				B1CC5D031E5AAC9E007E0589 /* SimpleCoreDataManageable.swift */,
+			);
+			path = SimpleCoreData;
+			sourceTree = "<group>";
+		};
+		B130596A1F43812900863AD7 /* CodableCoreData */ = {
+			isa = PBXGroup;
+			children = (
+				B130596E1F43815A00863AD7 /* CodableCoreDataManageable.swift */,
+				B13059701F43816600863AD7 /* CodableCoreDataStorable.swift */,
+				B13059721F43817600863AD7 /* GenericDecodable.swift */,
+			);
+			path = CodableCoreData;
 			sourceTree = "<group>";
 		};
 		B1C67CB51E4C56BA0035B138 /* Migrations */ = {
@@ -226,6 +238,15 @@
 				B1CC5D111E5B8FDB007E0589 /* CoreDataSandboxedPersonCRUDTests.swift */,
 			);
 			path = CoreData;
+			sourceTree = "<group>";
+		};
+		B1E1968B1F43AFD700991A2C /* UserDefaults */ = {
+			isa = PBXGroup;
+			children = (
+				B04F6D481BD1CB9800790FB3 /* UserDefaultsManager.swift */,
+				B04F6D4A1BD1CB9800790FB3 /* UserDefaultsStorable.swift */,
+			);
+			path = UserDefaults;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -332,26 +353,25 @@
 			buildActionMask = 2147483647;
 			files = (
 				B04F6D371BD1CB7900790FB3 /* UserDefaultsPersonController.swift in Sources */,
+				B13059731F43817600863AD7 /* GenericDecodable.swift in Sources */,
 				B04F6D361BD1CB7900790FB3 /* Spinner.swift in Sources */,
 				B04F6D561BD1CB9800790FB3 /* UserDefaultsStorable.swift in Sources */,
 				B04F6D541BD1CB9800790FB3 /* UserDefaultsManager.swift in Sources */,
 				B12E98C71E56494E00F0A577 /* MoveStore20170211.swift in Sources */,
 				B1CC5D2C1E5BA936007E0589 /* SerializableDataDemo.xcdatamodeld in Sources */,
+				B1AD38C01F4381F500CC22A8 /* JsonCoder.swift in Sources */,
+				B130596F1F43815A00863AD7 /* CodableCoreDataManageable.swift in Sources */,
 				B1CC5D251E5BA560007E0589 /* Migration4.xcmappingmodel in Sources */,
 				B04F6D381BD1CB7900790FB3 /* UserDefaultsPersonsController.swift in Sources */,
 				B1CC5D081E5AACB4007E0589 /* SimpleCoreDataManager.swift in Sources */,
 				B1CC5D181E5B9228007E0589 /* Migration4.swift in Sources */,
-				B11911181E5784A500BF7E06 /* SimpleSerializedCoreDataManageable.swift in Sources */,
-				B04F6D511BD1CB9800790FB3 /* SerializableData.swift in Sources */,
-				B04F6D521BD1CB9800790FB3 /* SerializedDataRetrievable.swift in Sources */,
 				B1CC5D051E5AAC9E007E0589 /* SimpleCoreDataManageable.swift in Sources */,
 				B04F6D4C1BD1CB9800790FB3 /* CoreDataPerson.swift in Sources */,
-				B04F6D4D1BD1CB9800790FB3 /* SimpleSerializedCoreDataStorable.swift in Sources */,
 				B1C67CB71E4C56BA0035B138 /* Migration3.swift in Sources */,
 				B12E98C51E56487000F0A577 /* CoreDataStructuralMigrations.swift in Sources */,
 				B04F6D0D1BD1CAFA00790FB3 /* AppDelegate.swift in Sources */,
 				B1E427031E4D68B0002C28E5 /* Migration3.xcmappingmodel in Sources */,
-				B04F6D531BD1CB9800790FB3 /* SerializedDataStorable.swift in Sources */,
+				B13059711F43816600863AD7 /* CodableCoreDataStorable.swift in Sources */,
 				B04F6D351BD1CB7900790FB3 /* CoreDataPersonsController.swift in Sources */,
 				B04F6D341BD1CB7900790FB3 /* CoreDataPersonController.swift in Sources */,
 				B04F6D551BD1CB9800790FB3 /* UserDefaultsPerson.swift in Sources */,
@@ -441,6 +461,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_SWIFT3_OBJC_INFERENCE = Off;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -481,6 +502,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_SWIFT3_OBJC_INFERENCE = Off;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};

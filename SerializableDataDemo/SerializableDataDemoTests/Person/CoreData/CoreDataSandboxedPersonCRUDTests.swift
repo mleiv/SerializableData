@@ -12,6 +12,8 @@ import XCTest
 class CoreDataSandboxedPersonCRUDTests: XCTestCase {
     // You can run performance tests on these, because they don't use static SimpleCoreDataManager.current.
     // It's just more annoying, because you have to pass the manager all around.
+
+    private let jsonCoder = JsonCoder()
     
     override func setUp() {
         super.setUp()
@@ -28,7 +30,7 @@ class CoreDataSandboxedPersonCRUDTests: XCTestCase {
     func testCreateRead() {
         testCreateRead(with: getSandboxedManager())
     }
-    func testCreateRead(with manager: SimpleSerializedCoreDataManageable) {
+    func testCreateRead(with manager: CodableCoreDataManageable) {
         let newPerson = createPhil(with: manager)
         let newPersonId = newPerson?.id
         // reload to make sure the value was created
@@ -40,7 +42,7 @@ class CoreDataSandboxedPersonCRUDTests: XCTestCase {
     func testReadAll() {
         testReadAll(with: getSandboxedManager())
     }
-    func testReadAll(with manager: SimpleSerializedCoreDataManageable) {
+    func testReadAll(with manager: CodableCoreDataManageable) {
         _ = createPhil(with: manager)
         _ = createLem(with: manager)
         _ = createVeronica(with: manager)
@@ -58,7 +60,7 @@ class CoreDataSandboxedPersonCRUDTests: XCTestCase {
     func testUpdate() {
         testUpdate(with: getSandboxedManager())
     }
-    func testUpdate(with manager: SimpleSerializedCoreDataManageable) {
+    func testUpdate(with manager: CodableCoreDataManageable) {
         _ = createPhil(with: manager)
         // reload to make sure the value was created
         var phil = CoreDataPerson.get(name: "Phil Myman", with: manager)
@@ -78,7 +80,7 @@ class CoreDataSandboxedPersonCRUDTests: XCTestCase {
     func testDelete() {
         testDelete(with: getSandboxedManager())
     }
-    func testDelete(with manager: SimpleSerializedCoreDataManageable) {
+    func testDelete(with manager: CodableCoreDataManageable) {
         _ = createPhil(with: manager)
         // reload to make sure the value was created
         var phil = CoreDataPerson.get(name: "Phil Myman", with: manager)
@@ -91,27 +93,36 @@ class CoreDataSandboxedPersonCRUDTests: XCTestCase {
     func testDeleteAll() {
         testDeleteAll(with: getSandboxedManager())
     }
-    func testDeleteAll(with manager: SimpleSerializedCoreDataManageable) {
+    func testDeleteAll(with manager: CodableCoreDataManageable) {
         testReadAll(with: manager)
         _ = CoreDataPerson.deleteAll(with: manager)
         XCTAssert(CoreDataPerson.getCount(with: manager) == 0, "Person deleteAll failed")
     }
     
-    private func createPhil(with manager: SimpleSerializedCoreDataManageable? = nil) -> CoreDataPerson? {
-        var phil = CoreDataPerson(serializedString: "{\"id\": \"\(UUID())\", \"name\": \"Phil Myman\", \"profession\": \"R&D Lab Scientist\", \"organization\": \"Veridian Dynamics\", \"notes\": \"You know what you did.\", \"createdDate\": \"2010-03-18 19:05:15\", \"modifiedDate\": \"2010-01-26 20:00:09\"}")
-        _ = phil?.save(with: manager)
-        return phil
+    private func createPhil(with manager: CodableCoreDataManageable? = nil) -> CoreDataPerson? {
+        if let data = "{\"id\": \"\(UUID())\", \"name\": \"Phil Myman\", \"profession\": \"R&D Lab Scientist\", \"organization\": \"Veridian Dynamics\", \"notes\": \"You know what you did.\", \"createdDate\": \"2010-03-18 19:05:15\", \"modifiedDate\": \"2010-01-26 20:00:09\"}".data(using: .utf8),
+            var phil = try? jsonCoder.decode(CoreDataPerson.self, from: data) {
+            _ = phil.save(with: manager)
+            return phil
+        }
+        return nil
     }
     
-    private func createLem(with manager: SimpleSerializedCoreDataManageable? = nil) -> CoreDataPerson? {
-        var lem = CoreDataPerson(serializedString: "{\"id\": \"\(UUID())\", \"name\": \"Lem Hewitt\", \"profession\": \"R&D Lab Scientist\", \"organization\": \"Veridian Dynamics\", \"notes\": \"You heard the statistically average lady.\", \"createdDate\": \"2017-02-20 13:14:00\", \"modifiedDate\": \"2017-02-20 13:14:00\"}")
-        _ = lem?.save(with: manager)
-        return lem
+    private func createLem(with manager: CodableCoreDataManageable? = nil) -> CoreDataPerson? {
+        if let data = "{\"id\": \"\(UUID())\", \"name\": \"Lem Hewitt\", \"profession\": \"R&D Lab Scientist\", \"organization\": \"Veridian Dynamics\", \"notes\": \"You heard the statistically average lady.\", \"createdDate\": \"2017-02-20 13:14:00\", \"modifiedDate\": \"2017-02-20 13:14:00\"}".data(using: .utf8),
+            var lem = try? jsonCoder.decode(CoreDataPerson.self, from: data) {
+            _ = lem.save(with: manager)
+            return lem
+        }
+        return nil
     }
     
-    private func createVeronica(with manager: SimpleSerializedCoreDataManageable? = nil) -> CoreDataPerson? {
-        var veronica = CoreDataPerson(serializedString: "{\"id\": \"\(UUID())\", \"name\": \"Veronica Palmer\", \"profession\": \"Executive\", \"organization\": \"Veridian Dynamics\", \"notes\": \"Friendship. It's the same as stealing.\", \"createdDate\": \"2010-03-18 19:00:07\", \"modifiedDate\": \"2010-01-26 23:17:20\"}")
-        _ = veronica?.save(with: manager)
-        return veronica
+    private func createVeronica(with manager: CodableCoreDataManageable? = nil) -> CoreDataPerson? {
+        if let data = "{\"id\": \"\(UUID())\", \"name\": \"Veronica Palmer\", \"profession\": \"Executive\", \"organization\": \"Veridian Dynamics\", \"notes\": \"Friendship. It's the same as stealing.\", \"createdDate\": \"2010-03-18 19:00:07\", \"modifiedDate\": \"2010-01-26 23:17:20\"}".data(using: .utf8),
+            var veronica = try? jsonCoder.decode(CoreDataPerson.self, from: data) {
+            _ = veronica.save(with: manager)
+            return veronica
+        }
+        return nil
     }
 }

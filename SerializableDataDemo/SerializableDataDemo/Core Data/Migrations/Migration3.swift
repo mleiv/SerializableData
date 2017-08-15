@@ -22,9 +22,9 @@ public class Migration3: NSEntityMigrationPolicy {
 
     /// Converts a serializedData String to Data.
     private func changeType(fromSerializedData serializedDataString: String?) -> Data {
-        if let serializedDataString = serializedDataString,
-            let person = CoreDataPerson(serializedString: serializedDataString),
-            let data = person.serializedData {
+        if let data1 = serializedDataString?.data(using: .utf8),
+            let person = try? SimpleCoreDataManager.current.decoder.decode(CoreDataPerson.self, from: data1),
+            let data = try? SimpleCoreDataManager.current.encoder.encode(person) {
             return data
         }
         return Data()

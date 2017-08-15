@@ -23,11 +23,10 @@ public class Migration4: NSEntityMigrationPolicy {
             return try super.createDestinationInstances(forSource: sInstance, in: mapping, manager: manager)
         }
         let dInstance = NSEntityDescription.insertNewObject(forEntityName: name, into: manager.destinationContext)
-        if let serializedData = sInstance.value(forKey: "serializedData") as? Data,
-            let data = try? SerializableData(serializedData: serializedData),
-            let item = CoreDataPerson(data: data, isAllowNoId: true) {
+        if let data = sInstance.value(forKey: "serializedData") as? Data,
+            let item = try? SimpleCoreDataManager.current.decoder.decode(CoreDataPerson.self, from: data) {
             dInstance.setValue(
-                item.serializedData,
+                try? SimpleCoreDataManager.current.encoder.encode(item),
                 forKey: "serializedData"
             )
             dInstance.setValue(

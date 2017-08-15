@@ -1,5 +1,5 @@
 //
-//  SimpleSerializedCoreDataManageable.swift
+//  CodableCoreDataManageable.swift
 //
 //  Copyright 2017 Emily Ivie
 
@@ -9,16 +9,37 @@
 
 import CoreData
 
-public protocol SimpleSerializedCoreDataManageable: SimpleCoreDataManageable {
+/// Abstracted JSONDecoder to just the method we need
+/// (so we could use any special configuration model created just for our app)
+public protocol CodableDecoder {
+    func decode<T>(_ type: T.Type, from data: Data) throws -> T where T : Decodable
 }
 
-extension SimpleSerializedCoreDataManageable {
+/// Abstracted JSONEncoder to just the method we need
+/// (so we could use any special configuration model created just for our app)
+public protocol CodableEncoder {
+    func encode<T>(_ value: T) throws -> Data where T : Encodable
+}
+
+/// Basic protocol requirements for our manager
+/// (most functionality is provided by default in extension)
+public protocol CodableCoreDataManageable: SimpleCoreDataManageable {
+
+    /// Required: Decoder initialized with correct configuration (date, etc)
+    var decoder: CodableDecoder { get }
+
+    /// Required: Encoder initialized with correct configuration (date, etc)
+    var encoder: CodableEncoder { get }
+
+}
+
+extension CodableCoreDataManageable {
     /// The closure type for editing fetch requests.
     /// (Duplicate these per file or use Whole Module Optimization, which is slow in dev)
-    public typealias AlterFetchRequest<T: NSManagedObject> = ((NSFetchRequest<T>)->Void)
-    
+    public typealias AlterFetchRequest<T: NSManagedObject> = ((NSFetchRequest<T>) -> Void)
+
     /// Retrieve single row with criteria closure.
-    public func getValue<T: SimpleSerializedCoreDataStorable>(
+    public func getValue<T: CodableCoreDataStorable>(
         alterFetchRequest: @escaping AlterFetchRequest<T.EntityType>
     ) -> T? {
         var result: T?
@@ -26,23 +47,26 @@ extension SimpleSerializedCoreDataManageable {
             transformEntity: { $0.value(forKey: T.serializedDataKey) as? Data },
             alterFetchRequest: alterFetchRequest
         ) {
-            result = T(serializedData: data)
+            do {
+                result = try decoder.decode(T.self, from: data)
+            } catch let decodeError {
+                print("Error: decoding failed for \(T.self): \(decodeError)")
+            }
         }
         return result
     }
-    
+
     /// Retrieve object row with criteria closure.
-    public func getObject<T: SimpleSerializedCoreDataStorable>(
+    public func getObject<T: CodableCoreDataStorable>(
         item: T
-//        completion: @escaping GetObjectCompletion<T.EntityType>
     ) -> T.EntityType? {
         return getOne { (fetchRequest: NSFetchRequest<T.EntityType>) in
             item.setIdentifyingPredicate(fetchRequest: fetchRequest)
         }
     }
-    
+
     /// Retrieve multiple rows with criteria closure.
-    public func getAllValues<T: SimpleSerializedCoreDataStorable>(
+    public func getAllValues<T: CodableCoreDataStorable>(
         alterFetchRequest: @escaping AlterFetchRequest<T.EntityType>
     ) -> [T] {
         var result: [T] = []
@@ -50,24 +74,31 @@ extension SimpleSerializedCoreDataManageable {
             transformEntity: { $0.value(forKey: T.serializedDataKey) as? Data },
             alterFetchRequest: alterFetchRequest
         )
-        result = data.flatMap { T(serializedData: $0) }
+        result = data.map { row -> T? in
+            do {
+                return try decoder.decode(T.self, from: row)
+            } catch let decodeError {
+                print("Error: decoding failed for \(T.self): \(decodeError)")
+            }
+            return nil
+        }.filter({  $0 != nil }).map({ $0! })
         return result
     }
 
     /// Save a single row of a CoreDataStorable object.
-    public func saveValue<T: SimpleSerializedCoreDataStorable>(
+    public func saveValue<T: CodableCoreDataStorable>(
         item: T
     ) -> Bool {
         return saveAllValues(items: [item])
     }
 
     /// Save multiple rows.
-    public func saveAllValues<T: SimpleSerializedCoreDataStorable>(
+    public func saveAllValues<T: CodableCoreDataStorable>(
         items: [T]
     ) -> Bool {
         guard !items.isEmpty else { return true }
         var result: Bool = false
-        let waitForEndTask = DispatchWorkItem() {} // semaphore flag
+        let waitForEndTask = DispatchWorkItem {} // semaphore flag
         persistentContainer.performBackgroundTask { moc in
             defer { waitForEndTask.perform() }
             moc.automaticallyMergesChangesFromParent = true
@@ -89,12 +120,12 @@ extension SimpleSerializedCoreDataManageable {
         waitForEndTask.wait()
         return result
     }
-    
+
     /// Delete single row of a CoreDataStorable object.
-    public func deleteValue<T: SimpleSerializedCoreDataStorable>(
+    public func deleteValue<T: CodableCoreDataStorable>(
         item: T
     ) -> Bool {
-        return deleteAll() { (fetchRequest: NSFetchRequest<T.EntityType>) in
+        return deleteAll { (fetchRequest: NSFetchRequest<T.EntityType>) in
             item.setIdentifyingPredicate(fetchRequest: fetchRequest)
         }
     }

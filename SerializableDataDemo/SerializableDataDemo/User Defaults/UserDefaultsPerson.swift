@@ -9,11 +9,12 @@
 
 import Foundation
 
-public struct UserDefaultsPerson {
+public struct UserDefaultsPerson: Codable {
     
     public fileprivate(set) var createdDate = Date()
     public var modifiedDate = Date()
-    
+
+    public var id: UUID
     public var name: String
     
     public var profession: String?
@@ -23,53 +24,21 @@ public struct UserDefaultsPerson {
     
     // MARK: Basic initializer
     
-    public init(name: String) {
+    public init(id: UUID? = nil, name: String) {
+        self.id = id ?? UUID()
         self.name = name
     }
-}
 
-//MARK: Saving/Retrieving Data
-
-extension UserDefaultsPerson: SerializedDataStorable {
-
-    public func getData() -> SerializableData {
-        var list = [String: SerializedDataStorable?]()
-        list["name"] = name
-        list["profession"] = profession
-        list["organization"] = organization
-        list["notes"] = notes
-        list["createdDate"] = createdDate
-        list["modifiedDate"] = modifiedDate
-        return SerializableData.safeInit(list)
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
+        name = try container.decodeIfPresent(String.self, forKey: .name) ?? ""
+        profession = try container.decodeIfPresent(String.self, forKey: .profession) ?? ""
+        organization = try container.decodeIfPresent(String.self, forKey: .organization) ?? ""
+        notes = try container.decodeIfPresent(String.self, forKey: .notes) ?? ""
+        createdDate = try container.decodeIfPresent(Date.self, forKey: .createdDate) ?? Date()
+        modifiedDate = try container.decodeIfPresent(Date.self, forKey: .createdDate) ?? Date()
     }
-    
-}
-
-extension UserDefaultsPerson: SerializedDataRetrievable {
-    
-    public init?(data: SerializableData?) {
-        guard let data = data, let name = data["name"]?.string
-        else {
-            return nil
-        }
-        // required values:
-        self.name = name
-        // optional values:
-        setData(data)
-    }
-    
-    public mutating func setData(_ data: SerializableData) {
-        //mandatory data (probably already set, but allow it to be set again if setData() was called separately)
-        name = data["name"]?.string ?? name
-        
-        //optional values:
-        createdDate = data["createdDate"]?.date ?? Date()
-        modifiedDate = data["modifiedDate"]?.date ?? Date()
-        profession = data["profession"]?.string
-        organization = data["organization"]?.string
-        notes = data["notes"]?.string
-    }
-    
 }
 
 //MARK: Equatable

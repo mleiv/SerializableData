@@ -9,11 +9,15 @@
 
 import CoreData
 
-struct SimpleCoreDataManager: SimpleSerializedCoreDataManageable {
+struct SimpleCoreDataManager: CodableCoreDataManageable {
     public static let defaultStoreName = "SerializableDataDemo"
     public var serializedDataKey: String { return "serializedData" }
     
     public static var current: SimpleCoreDataManager = SimpleCoreDataManager(storeName: defaultStoreName)
+
+    private var coder = JsonCoder()
+    public var decoder: CodableDecoder { return self.coder }
+    public var encoder: CodableEncoder { return self.coder }
 
     public static var isManageMigrations: Bool = true // we manage migrations
     public var isConfinedToMemoryStore: Bool = false

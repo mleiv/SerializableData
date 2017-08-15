@@ -7,7 +7,6 @@
 //  For full copyright and license information, please see http://opensource.org/licenses/MIT
 //  Redistributions of files must retain the above copyright notice.
 
-
 import CoreData
 
 /// Manages the storage and retrieval of CoreDataStorable/SerializableData objects.

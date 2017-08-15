@@ -13,6 +13,8 @@ class CoreDataPersonCRUDTests: XCTestCase {
 
     // can't do performance tests in this version
     
+    private let jsonCoder = JsonCoder()
+    
     override func setUp() {
         super.setUp()
         SimpleCoreDataManager.current = getSandboxedManager()
@@ -83,23 +85,32 @@ class CoreDataPersonCRUDTests: XCTestCase {
         _ = CoreDataPerson.deleteAll()
         XCTAssert(CoreDataPerson.getCount() == 0, "Person deleteAll failed")
     }
-    
-    private func createPhil() -> CoreDataPerson? {
-        var phil = CoreDataPerson(serializedString: "{\"id\": \"\(UUID())\", \"name\": \"Phil Myman\", \"profession\": \"R&D Lab Scientist\", \"organization\": \"Veridian Dynamics\", \"notes\": \"You know what you did.\", \"createdDate\": \"2010-03-18 19:05:15\", \"modifiedDate\": \"2010-01-26 20:00:09\"}")
-        _ = phil?.save()
-        return phil
+
+    private func createPhil(with manager: CodableCoreDataManageable? = nil) -> CoreDataPerson? {
+        if let data = "{\"id\": \"\(UUID())\", \"name\": \"Phil Myman\", \"profession\": \"R&D Lab Scientist\", \"organization\": \"Veridian Dynamics\", \"notes\": \"You know what you did.\", \"createdDate\": \"2010-03-18 19:05:15\", \"modifiedDate\": \"2010-01-26 20:00:09\"}".data(using: .utf8),
+            var phil = try? jsonCoder.decode(CoreDataPerson.self, from: data) {
+            _ = phil.save(with: manager)
+            return phil
+        }
+        return nil
     }
-    
-    private func createLem() -> CoreDataPerson? {
-        var lem = CoreDataPerson(serializedString: "{\"id\": \"\(UUID())\", \"name\": \"Lem Hewitt\", \"profession\": \"R&D Lab Scientist\", \"organization\": \"Veridian Dynamics\", \"notes\": \"You heard the statistically average lady.\", \"createdDate\": \"2017-02-20 13:14:00\", \"modifiedDate\": \"2017-02-20 13:14:00\"}")
-        _ = lem?.save()
-        return lem
+
+    private func createLem(with manager: CodableCoreDataManageable? = nil) -> CoreDataPerson? {
+        if let data = "{\"id\": \"\(UUID())\", \"name\": \"Lem Hewitt\", \"profession\": \"R&D Lab Scientist\", \"organization\": \"Veridian Dynamics\", \"notes\": \"You heard the statistically average lady.\", \"createdDate\": \"2017-02-20 13:14:00\", \"modifiedDate\": \"2017-02-20 13:14:00\"}".data(using: .utf8),
+            var lem = try? jsonCoder.decode(CoreDataPerson.self, from: data) {
+            _ = lem.save(with: manager)
+            return lem
+        }
+        return nil
     }
-    
-    private func createVeronica() -> CoreDataPerson? {
-        var veronica = CoreDataPerson(serializedString: "{\"id\": \"\(UUID())\", \"name\": \"Veronica Palmer\", \"profession\": \"Executive\", \"organization\": \"Veridian Dynamics\", \"notes\": \"Friendship. It's the same as stealing.\", \"createdDate\": \"2010-03-18 19:00:07\", \"modifiedDate\": \"2010-01-26 23:17:20\"}")
-        _ = veronica?.save()
-        return veronica
+
+    private func createVeronica(with manager: CodableCoreDataManageable? = nil) -> CoreDataPerson? {
+        if let data = "{\"id\": \"\(UUID())\", \"name\": \"Veronica Palmer\", \"profession\": \"Executive\", \"organization\": \"Veridian Dynamics\", \"notes\": \"Friendship. It's the same as stealing.\", \"createdDate\": \"2010-03-18 19:00:07\", \"modifiedDate\": \"2010-01-26 23:17:20\"}".data(using: .utf8),
+            var veronica = try? jsonCoder.decode(CoreDataPerson.self, from: data) {
+            _ = veronica.save(with: manager)
+            return veronica
+        }
+        return nil
     }
     
 }

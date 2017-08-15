@@ -31,8 +31,14 @@ public struct UserDefaultsManager {
     
     static func saveAll<T: UserDefaultsStorable>(items: [T]) -> Bool {
         let defaults = UserDefaults.standard
-        print(SerializableData.safeInit(items))
-        defaults.set(SerializableData.safeInit(items).serializedString, forKey: T.userDefaultsEntityName)
+        let serializedString: String
+        if let data = try? SimpleCoreDataManager.current.encoder.encode(items),
+            let string = String(data: data, encoding: .utf8) {
+            serializedString = string
+        } else {
+            serializedString = ""
+        }
+        defaults.set(serializedString, forKey: T.userDefaultsEntityName)
         return true
     }
     
@@ -54,11 +60,9 @@ public struct UserDefaultsManager {
     public static func getAll<T: UserDefaultsStorable>(filter: AlterUserDefaultsRequestClosure<T> = { _ in true }) -> [T] {
         do {
             let defaults = UserDefaults.standard
-            if let serializedString = defaults.object(forKey: T.userDefaultsEntityName) as? String {
-                let serializedList = try SerializableData(jsonString: serializedString)
-                let all = (serializedList.array ?? []).flatMap {
-                    return T(data: $0)
-                }
+            if let serializedString = defaults.object(forKey: T.userDefaultsEntityName) as? String,
+                let data = serializedString.data(using: .utf8) {
+                let all = try SimpleCoreDataManager.current.decoder.decode([T].self, from: data)
                 return all.filter(filter)
             }
         } catch let saveError as NSError {

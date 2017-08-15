@@ -9,11 +9,11 @@
 
 import Foundation
 
-public struct CoreDataPerson {
+public struct CoreDataPerson: CodableCoreDataStorable {
 
     // MARK: Basic properties
     
-    public fileprivate(set) var createdDate = Date()
+    public private(set) var createdDate = Date()
     public var modifiedDate = Date()
     
     public var id: UUID
@@ -30,75 +30,34 @@ public struct CoreDataPerson {
         self.id = id ?? UUID()
         self.name = name
     }
-}
 
-//MARK: Saving/Retrieving Data
-
-extension CoreDataPerson: SerializedDataStorable {
-    
-    /// Anything we want to save to core data should be put here.
-    public func getData() -> SerializableData {
-        var list = [String: SerializedDataStorable?]()
-        list["id"] = id.uuidString
-        list["name"] = name
-        list["profession"] = profession
-        list["organization"] = organization
-        list["notes"] = notes
-        list["createdDate"] = createdDate
-        list["modifiedDate"] = modifiedDate
-//        print(SerializableData(list).serializedString)
-        return SerializableData.safeInit(list)
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
+        name = try container.decodeIfPresent(String.self, forKey: .name) ?? ""
+        profession = try container.decodeIfPresent(String.self, forKey: .profession) ?? ""
+        organization = try container.decodeIfPresent(String.self, forKey: .organization) ?? ""
+        notes = try container.decodeIfPresent(String.self, forKey: .notes) ?? ""
+        createdDate = try container.decodeIfPresent(Date.self, forKey: .createdDate) ?? Date()
+        modifiedDate = try container.decodeIfPresent(Date.self, forKey: .createdDate) ?? Date()
     }
-    
-}
-
-extension CoreDataPerson: SerializedDataRetrievable {
-    
-    /// Recreation of person from SerializableData object.
-    public init?(data: SerializableData?) {
-        self.init(data: data, isAllowNoId: true)
-    }
-    public init?(data: SerializableData?, isAllowNoId: Bool) {
-        let defaultUuid: UUID? = isAllowNoId ? UUID() : nil
-        guard let data = data,
-            let id = UUID(uuidString: data["id"]?.string ?? "") ?? defaultUuid,
-            let name = data["name"]?.string
-        else {
-            return nil
-        }
-        // required values:
-        self.init(id: id, name: name)
-        // optional values:
-        setData(data)
-    }
-    
-    /// Anything we want to retrieve from core data should be put here.
-    public mutating func setData(_ data: SerializableData) {
-        //mandatory data (probably already set, but allow it to be set again if setData() was called separately)
-        id = UUID(uuidString: data["id"]?.string ?? "") ?? id
-        name = data["name"]?.string ?? name
-        
-        //optional values:
-        createdDate = data["createdDate"]?.date ?? Date()
-        modifiedDate = data["modifiedDate"]?.date ?? Date()
-        profession = data["profession"]?.string
-        organization = data["organization"]?.string
-        notes = data["notes"]?.string
-    }
-    
 }
 
 //MARK: CoreData
 
 import CoreData
 
-extension CoreDataPerson: SimpleSerializedCoreDataStorable {
+extension CoreDataPerson {
 
     /// Core data entity type for persons.
     public typealias EntityType = Persons
     
     /// Reference to current core data manager.
-    public static var defaultManager: SimpleSerializedCoreDataManageable { return SimpleCoreDataManager.current }
+    public static var defaultManager: CodableCoreDataManageable { return SimpleCoreDataManager.current }
+
+    public var serializedData: Data? {
+        return try? CoreDataPerson.defaultManager.encoder.encode(self)
+    }
     
     /// Copy this person's values to core data row.
     public func setAdditionalColumnsOnSave(
@@ -119,7 +78,7 @@ extension CoreDataPerson: SimpleSerializedCoreDataStorable {
     /// Convenience: get person by id.
     public static func get(
         id: String,
-        with manager: SimpleSerializedCoreDataManageable? = nil
+        with manager: CodableCoreDataManageable? = nil
     ) -> CoreDataPerson? {
         let manager = manager ?? defaultManager
         let person: CoreDataPerson? = manager.getValue() { fetchRequest in
@@ -131,7 +90,7 @@ extension CoreDataPerson: SimpleSerializedCoreDataStorable {
     /// Convenience: get person by name.
     public static func get(
         name: String,
-        with manager: SimpleSerializedCoreDataManageable? = nil
+        with manager: CodableCoreDataManageable? = nil
     ) -> CoreDataPerson? {
         let manager = manager ?? defaultManager
         let person: CoreDataPerson? = manager.getValue() { fetchRequest in

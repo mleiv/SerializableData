@@ -10,7 +10,7 @@
 import Foundation
 import CoreData
 
-public protocol UserDefaultsStorable: SerializedDataStorable, SerializedDataRetrievable {
+public protocol UserDefaultsStorable {
 
     static var userDefaultsEntityName: String { get }
     
@@ -19,3 +19,4 @@ public protocol UserDefaultsStorable: SerializedDataStorable, SerializedDataRetr
     mutating func save() -> Bool
     mutating func delete() -> Bool
 }
+
