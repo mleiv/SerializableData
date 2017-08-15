@@ -2,6 +2,13 @@
 
 **An easy Swift 3.0 library to get/set json-type data, usable in NSUserDefaults and CoreData**
 
+## News 2017-08-15
+
+I highly recommend removing SerializableData from your projects in favor of the newer, easier, more concise **Codable** protocol from Apple. I have created a new branch converting the prior demo app as an example: https://github.com/mleiv/SerializableData/tree/Swift4Codable
+
+You don't have to convert all your objects at once, as these two protocols can work alongside each other quite easily. 
+
+
 ## Including in Your App
 
 There is no CocoaPods or Carthage installation option. If you want this, just copy in the necessary code files (helpfully placed in the **Necessary Code Files** folder inside this repo) and you're set!
@@ -9,8 +16,6 @@ There is no CocoaPods or Carthage installation option. If you want this, just co
 * SerializableData.swift
 * SerializedDataStorable.swift
 * SerializedDataRetrievable.swift
-* StringExtension.swift
-* DictionaryExtension.swift
 
 ## News 2016-09-17
 
